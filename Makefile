@@ -46,7 +46,7 @@ endif
 
 ## Update project version ($increment=[major|minor|patch])
 version:
-ifeq ($(shell git branch | grep \* | cut -d ' ' -f2),master)
+ifeq ($(shell git branch | grep \* | cut -d ' ' -f2), main)
 	python -m scripts.version ${increment}
 else
 	@echo ">>> ERROR: no new version applied.\n"

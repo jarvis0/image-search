@@ -49,11 +49,11 @@ def write_changelog(setup_file, old_version):
         changelog = f.readlines()
 
     with open('CHANGELOG.md', 'w') as f:
-        repo = setup_file.get('gitlab', 'repository_url')
+        repo = setup_file.get('github', 'repository_url')
         version = setup_file.get('project', 'version')
         for line in changelog:
             if line.startswith('## [Unreleased]'):
-                f.write(f'## [Unreleased]\n')
+                f.write('## [Unreleased]\n')
                 f.write('\n')
                 f.write(f'## [{version}]({repo}/compare/v{old_version}...v{version})\n')
             else:
