@@ -12,7 +12,7 @@ setup(
     description=config.get('project', 'description'),
     author='Giuseppe Mascellaro',
     author_email='giuseppe.mascellaro@mail.polimi.it',
-    license='Apache License 2.0',
+    license='',
     url=config.get('github', 'repository_url'),
     packages=find_packages(where='src', exclude=('tests.*', 'tests')),
     package_dir={'': 'src'},
@@ -48,7 +48,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'assist = typing-assistant.assist:main',
+            'assist = typing_assistant.assist:main',
         ],
     },
 )
