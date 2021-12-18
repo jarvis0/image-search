@@ -28,6 +28,7 @@ setup(
     extras_require={
         'dev': [
             'ipython==7.18.1',
+            'notebook',
         ],
         'lint': [
             'flake8-builtins<2.0.0',
