@@ -1,10 +1,7 @@
-import time
 from collections import Counter
 from typing import Dict, List, Optional, Union
 
-import pandas as pd
-
-from .tokenizer import Collection
+from .collector import Collection
 
 
 class Posting:
@@ -44,29 +41,3 @@ class InvertedIndex:
             for term, postings in self.index.items()
         }
         self.index = None
-
-    def lookup_query(self, query):
-        postings = self.lexicon[query]['postings']
-        return [self.collection.get_document(p.docId) for p in postings]
-
-
-if __name__ == '__main__':
-    corpus = pd.read_csv('data/captions.tsv', sep='\t', index_col='id').iloc[:]['caption'].to_dict()
-    tic = time.time()
-    collection = Collection(corpus)
-    collection.build_collection()
-    print('build collection', time.time() - tic)
-    tic = time.time()
-    inv_index = InvertedIndex(collection)
-    inv_index.index_collection()
-    print('index collection', time.time() - tic)
-    tic = time.time()
-    inv_index.build_lexicon()
-    print('build lexicon', time.time() - tic)
-    print('inv_index entries', len(inv_index.lexicon))
-    # print(inv_index.lexicon)
-    query = 'player'
-    tic = time.time()
-    result = inv_index.lookup_query(query)
-    print('query', time.time() - tic)
-    print(result)

@@ -23,7 +23,7 @@ setup(
         'uvicorn==0.16.0',
         'numpy==1.21.4',
         'pandas==1.3.4',
-        'scipy==1.7.3',
+        'scipy==1.8.0rc1',
         'nltk==3.6.5',
     ],
     extras_require={

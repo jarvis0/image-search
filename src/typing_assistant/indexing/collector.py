@@ -11,9 +11,8 @@ class Document:
     def __repr__(self):
         return self.text
 
-    def tokenize(self):
-        clean_text = re.sub(r'[^\w\s]', '', self.text)
-        self.tokens = clean_text.split()
+    def tokenize_text(self):
+        self.tokens = tuple(re.findall(r'\w+', self.text))
 
 
 class Collection:
@@ -26,7 +25,7 @@ class Collection:
 
     def __add_document(self, docId: str, text: str):
         document = Document(text)
-        document.tokenize()
+        document.tokenize_text()
         self.unique_tokens.update(document.tokens)
         self.documents[docId] = document
 
@@ -37,4 +36,4 @@ class Collection:
         self.unique_tokens = sorted(list(self.unique_tokens))
 
     def get_document(self, docId: str) -> Document:
-        return self.documents.get(docId, None)
+        return self.documents[docId]
