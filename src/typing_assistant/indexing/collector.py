@@ -7,12 +7,14 @@ class Document:
     def __init__(self, text: str):
         self.text: str = text
         self.tokens: Optional[List[str]] = None
+        self.length: Optional[int] = None
 
     def __repr__(self):
         return self.text
 
     def tokenize_text(self):
         self.tokens = tuple(re.findall(r'\w+', self.text))
+        self.length = len(self.tokens)
 
 
 class Collection:

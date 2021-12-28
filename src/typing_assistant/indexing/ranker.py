@@ -1,3 +1,4 @@
+from collections import defaultdict
 import re
 import time
 from typing import Dict, List
@@ -14,8 +15,7 @@ class BM25Plus:
         self.collection: Collection = collection
         self.inv_index: InvertedIndex = inv_index
         self.avgdl: float = sum(x['tot_freq'] for x in self.inv_index.lexicon.values()) / len(self.collection.documents)
-        print(self.avgdl)
-        self.doc_freqs: List[int] = []
+        self.doc_freqs: List[int] = []  # TODO
         self.idf: Dict = {}  # TODO
         self.doc_len: List = []  # TODO
         self.k1: float = k1
@@ -24,13 +24,18 @@ class BM25Plus:
 
     def lookup_query(self, query):
         query_words = tuple(re.findall(r'\w+', query))
-        accumulators = {}
+        tf, idf = defaultdict(lambda: defaultdict(int)), {}
         for w in query_words:
-            postings = self.inv_index.lexicon[w]['postings']
-            for p in postings:
-                accumulators[p.docId] = accumulators.get(p.docId, 0) + p.frequency
-        sorted_accumulators = dict(sorted(accumulators.items(), key=lambda x: x[1], reverse=True))
-        return [(self.collection.get_document(docId), sorted_accumulators[docId]) for docId in sorted_accumulators][: 5]
+            lexicon_entry = self.inv_index.lexicon[w]
+            idf[w] = lexicon_entry['idf']
+            for p in lexicon_entry['postings']:
+                tf[w][p.docId] += p.frequency
+        scores = defaultdict(int)
+        for w in query_words:
+            for docId in tf[w]:
+                scores[docId] += ((self.k1 + 1) * tf[w][docId]) / (tf[w][docId] + self.k1 * (1 - self.b + self.b * self.collection.get_document(docId).length / self.avgdl)) * idf[w]
+        sorted_scores = dict(sorted(scores.items(), key=lambda x: x[1], reverse=True))
+        return [(self.collection.get_document(docId), sorted_scores[docId]) for docId in sorted_scores][: 5]
 
 
 if __name__ == '__main__':
