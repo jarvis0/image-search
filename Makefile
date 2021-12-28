@@ -3,7 +3,7 @@
 PROJECT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 PROJECT_NAME = $(notdir $(CURDIR))
 MACRO_PROJECT_NAME = $(shell echo ${PROJECT_NAME} | cut -d . -f1)
-PYTHON_VERSION = 3.8.12
+PYTHON_VERSION = 3.8.11
 SHELL=/bin/bash
 
 ifeq (,$(shell which conda))
