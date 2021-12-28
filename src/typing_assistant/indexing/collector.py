@@ -23,6 +23,7 @@ class Collection:
         self.corpus: Optional[Dict[int, str]] = corpus
         self.docIds: List[int] = list(self.corpus.keys())
         self.documents: Dict[int, Document] = {}
+        self.n_documents: int = 0
         self.unique_tokens: Union[Set[str], List[str]] = set()
 
     def __add_document(self, docId: str, text: str):
@@ -36,6 +37,13 @@ class Collection:
             self.__add_document(docId, self.corpus[docId])
         self.corpus = None
         self.unique_tokens = sorted(list(self.unique_tokens))
+        self.n_documents = len(self.documents)
 
     def get_document(self, docId: str) -> Document:
         return self.documents[docId]
+
+    def get_n_documents(self) -> int:
+        return self.n_documents
+
+    def get_doc_length(self, docId: str) -> int:
+        return self.documents[docId].length

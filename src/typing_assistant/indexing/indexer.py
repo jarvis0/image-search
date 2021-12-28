@@ -19,7 +19,6 @@ class InvertedIndex:
 
     def __init__(self, collection: Collection):
         self.collection: Collection = collection
-        self.collection_size: int = len(self.collection.documents)
         self.index: Optional[Dict[str, List[Posting]]] = dict.fromkeys(self.collection.unique_tokens, [])
         self.lexicon: Dict[str, Dict[str, Union[int, Posting]]] = None
 
@@ -34,11 +33,12 @@ class InvertedIndex:
             self.__index_document(docId)
 
     def build_lexicon(self):
+        n_documents = self.collection.get_n_documents()
         self.lexicon = {
             term: {
                 'n_docs': len(postings),
                 'tot_freq': sum(p.frequency for p in postings),
-                'idf': math.log((self.collection_size + 1) / len(postings)),
+                'idf': math.log((n_documents + 1) / len(postings)),
                 'postings': postings,
             }
             for term, postings in self.index.items()

@@ -1,7 +1,7 @@
-from collections import defaultdict
 import re
 import time
-from typing import Dict, List
+from collections import defaultdict
+from typing import List, Tuple
 
 import pandas as pd
 
@@ -11,18 +11,15 @@ from .indexer import InvertedIndex
 
 class BM25Plus:
 
-    def __init__(self, collection: Collection, inv_index: InvertedIndex, k1: float = 1.5, b: float = 0.75, delta: float = 1.):
+    def __init__(self, collection: Collection, inv_index: InvertedIndex, kappa: float = 1.5, beta: float = 0.75, delta: float = 1.):
         self.collection: Collection = collection
         self.inv_index: InvertedIndex = inv_index
-        self.avgdl: float = sum(x['tot_freq'] for x in self.inv_index.lexicon.values()) / len(self.collection.documents)
-        self.doc_freqs: List[int] = []  # TODO
-        self.idf: Dict = {}  # TODO
-        self.doc_len: List = []  # TODO
-        self.k1: float = k1
-        self.b: float = b
+        self.kappa: float = kappa
+        self.beta: float = beta
         self.delta: float = delta
+        self.avgdl: float = sum(x['tot_freq'] for x in self.inv_index.lexicon.values()) / self.collection.n_documents
 
-    def lookup_query(self, query):
+    def lookup_query(self, query: str) -> List[Tuple[str, float]]:
         query_words = tuple(re.findall(r'\w+', query))
         tf, idf = defaultdict(lambda: defaultdict(int)), {}
         for w in query_words:
@@ -33,13 +30,14 @@ class BM25Plus:
         scores = defaultdict(int)
         for w in query_words:
             for docId in tf[w]:
-                scores[docId] += ((self.k1 + 1) * tf[w][docId]) / (tf[w][docId] + self.k1 * (1 - self.b + self.b * self.collection.get_document(docId).length / self.avgdl)) * idf[w]
-        sorted_scores = dict(sorted(scores.items(), key=lambda x: x[1], reverse=True))
-        return [(self.collection.get_document(docId), sorted_scores[docId]) for docId in sorted_scores][: 5]
+                print(self.collection.get_doc_length(docId) / self.avgdl)
+                scores[docId] += (self.delta + ((self.kappa + 1) * tf[w][docId])) / (tf[w][docId] + self.kappa * (1 - self.beta + self.beta * self.collection.get_doc_length(docId) / self.avgdl)) * idf[w]
+        sorted_results = list(sorted(scores.items(), key=lambda x: x[1], reverse=True))[: 5]
+        return [(self.collection.get_document(docId), score) for docId, score in sorted_results]
 
 
 if __name__ == '__main__':
-    corpus = pd.read_csv('data/captions.tsv', sep='\t', index_col='id')['caption'].to_dict()
+    corpus = pd.read_csv('data/captions.tsv', sep='\t', index_col='id')['caption'].iloc[: 8].to_dict()
     print('number of sentences:', len(corpus))
     tic = time.time()
     collection = Collection(corpus)
