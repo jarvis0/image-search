@@ -29,3 +29,35 @@ class BM25Ranker:
                     tf[w][doc_id] + self.kappa * (1 - self.beta + self.beta * self.collection.get_doc_length(doc_id) / self.avgdl)))
         sorted_results = list(sorted(scores.items(), key=lambda x: x[1], reverse=True))[: 5]
         return [(self.collection.get_document(doc_id), score) for doc_id, score in sorted_results]
+
+    def linear_lookup_query(self, query: str) -> List[Tuple[str, float]]:
+        query_words = tuple(re.findall(r'\w+', query))
+        tf, idf = defaultdict(lambda: defaultdict(int)), {}
+        for w in query_words:
+            word_lexicon = self.lexicon.search_word_lexicon(w)
+            idf[w] = word_lexicon.idf
+            for p in word_lexicon.postings:
+                tf[w][p.doc_id] += p.frequency
+        scores = defaultdict(int)
+        for doc_id in tf[w]:
+            for w in query_words:
+                scores[doc_id] += idf[w] * ((self.kappa + 1) * tf[w][doc_id] / (
+                    tf[w][doc_id] + self.kappa * (1 - self.beta + self.beta * self.collection.get_doc_length(doc_id) / self.avgdl)))
+        sorted_results = list(sorted(scores.items(), key=lambda x: x[1], reverse=True))[: 5]
+        return [(self.collection.get_document(doc_id), score) for doc_id, score in sorted_results]
+
+    def approximate_lookup_query(self, query: str) -> List[Tuple[str, float]]:
+        query_words = tuple(re.findall(r'\w+', query))
+        tf, idf = defaultdict(lambda: defaultdict(int)), {}
+        for w in query_words:
+            word_lexicon = self.lexicon.search_word_lexicon(w)
+            idf[w] = word_lexicon.idf
+            for p in word_lexicon.postings:
+                tf[w][p.doc_id] += p.frequency
+        scores = defaultdict(int)
+        for doc_id in tf[w]:
+            for w in query_words:
+                scores[doc_id] += idf[w] * ((self.kappa + 1) * tf[w][doc_id] / (
+                    tf[w][doc_id] + self.kappa * (1 - self.beta + self.beta * self.collection.get_doc_length(doc_id) / self.avgdl)))
+        sorted_results = list(sorted(scores.items(), key=lambda x: x[1], reverse=True))[: 5]
+        return [(self.collection.get_document(doc_id), score) for doc_id, score in sorted_results]

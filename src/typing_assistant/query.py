@@ -15,10 +15,12 @@ if __name__ == '__main__':
     print('load lexicon', time.time() - tic)
     print('lexicon entries', len(lexicon.get_words_lexicon()))
 
-    tic = time.time()
     ranker = BM25Ranker(collection, lexicon)
-    query = 'basketball player'
-    results = ranker.lookup_query(query)
-    print('query', time.time() - tic)
+    n = 100
+    tic = time.time()
+    for _ in range(n):
+        query = 'basketball player'
+        results = ranker.linear_lookup_query(query)
+    print('query', (time.time() - tic) / n)
     for text, score in results:
         print(score, text)

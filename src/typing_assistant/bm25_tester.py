@@ -15,12 +15,14 @@ if __name__ == '__main__':
     tic = time.time()
     bm25 = BM25Plus(tokenized_corpus)
     print('index', time.time() - tic)
+    n = 100
     tic = time.time()
-    query = 'basketball player'
-    tokenized_query = tuple(re.findall(r'\w+', query))
-    scores = bm25.get_scores(tokenized_query)
-    corpus_scores = list(zip(corpus, scores))
-    result = sorted(corpus_scores, key=lambda x: x[1], reverse=True)[: 8]
-    print('query', time.time() - tic)
+    for _ in range(n):
+        query = 'basketball player'
+        tokenized_query = tuple(re.findall(r'\w+', query))
+        scores = bm25.get_scores(tokenized_query)
+        corpus_scores = list(zip(corpus, scores))
+        result = sorted(corpus_scores, key=lambda x: x[1], reverse=True)[: 8]
+    print('query', (time.time() - tic) / n)
     for sentence, score in result:
         print(score, sentence)
