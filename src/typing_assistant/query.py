@@ -20,8 +20,8 @@ if __name__ == '__main__':
     n = 10
     tic = time.time()
     for _ in range(n):
-        query = 'player player ftball ftball'
-        results = ranker.approximate_lookup_query(query)
+        query = 'runnig ftball player in a field'
+        results = ranker.lookup_query(query)
     print('query', (time.time() - tic) / n)
     for text, score in results:
         print(score, text)

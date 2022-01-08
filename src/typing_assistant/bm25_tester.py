@@ -16,7 +16,7 @@ if __name__ == '__main__':
     bm25 = BM25Okapi(tokenized_corpus)
     print('index', time.time() - tic)
     tic = time.time()
-    query = 'player player'
+    query = 'running football player in a field'
     tokenized_query = tuple(re.findall(r'\w+', query))
     scores = bm25.get_scores(tokenized_query)
     corpus_scores = list(zip(corpus, scores))

@@ -51,7 +51,7 @@ class Lexicon:
     def init_query_mode(self):
         self.matcher = SequenceMatcher(isjunk=None, autojunk=False)
 
-    def query_expansion(self, query_words: List[str]) -> List[str]:
+    def expand_query(self, query_words: List[str]) -> List[str]:
         cutoff = 0.8
         exact_words = set(query_words) & set(self.lexicon)
         approx_words = set(query_words) - exact_words
