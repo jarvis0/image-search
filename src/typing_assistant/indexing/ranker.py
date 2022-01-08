@@ -9,7 +9,7 @@ from .collector import Collection
 from .indexer import InvertedIndex
 
 
-class BM25Plus:
+class BM25PlusRanker:
 
     def __init__(self, collection: Collection, inv_index: InvertedIndex, kappa: float = 1.5, beta: float = 0.75, delta: float = 1.):
         self.collection: Collection = collection
@@ -28,10 +28,10 @@ class BM25Plus:
             for p in lexicon_entry['postings']:
                 tf[w][p.docId] += p.frequency
         scores = defaultdict(int)
-        for w in query_words:
-            for docId in tf[w]:
-                print(self.collection.get_doc_length(docId) / self.avgdl)
-                scores[docId] += (self.delta + ((self.kappa + 1) * tf[w][docId])) / (tf[w][docId] + self.kappa * (1 - self.beta + self.beta * self.collection.get_doc_length(docId) / self.avgdl)) * idf[w]
+        for docId in tf[w]:
+            for w in query_words:
+                scores[docId] += idf[w] * (self.delta + ((self.kappa + 1) * tf[w][docId]) / (
+                    tf[w][docId] + self.kappa * (1 - self.beta + self.beta * self.collection.get_doc_length(docId) / self.avgdl)))
         sorted_results = list(sorted(scores.items(), key=lambda x: x[1], reverse=True))[: 5]
         return [(self.collection.get_document(docId), score) for docId, score in sorted_results]
 
@@ -52,8 +52,8 @@ if __name__ == '__main__':
     print('build lexicon', time.time() - tic)
     print('inv_index entries', len(inv_index.lexicon))
     tic = time.time()
-    ranker = BM25Plus(collection, inv_index)
-    query = 'football player'
+    ranker = BM25PlusRanker(collection, inv_index)
+    query = 'basketball player'
     results = ranker.lookup_query(query)
     print('query', time.time() - tic)
     for text, score in results:
