@@ -1,6 +1,6 @@
-from .collector import Collection
-from .lex import Lexicon
-from .parallel_indexer import InvertedIndex
+from .collection import Collection
+from .indexer import InvertedIndex
+from .lexicon import Lexicon
 
 __all__ = [
     'Collection',

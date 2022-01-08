@@ -15,9 +15,8 @@ if __name__ == '__main__':
     print('load lexicon', time.time() - tic)
     print('lexicon entries', len(lexicon.get_words_lexicon()))
 
-    lexicon.init_query_mode()
     ranker = OkapiBM25Ranker(collection, lexicon)
-    n = 1
+    n = 10
     tic = time.time()
     for _ in range(n):
         query = 'running football player player in field across football'

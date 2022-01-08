@@ -1,10 +1,8 @@
 import math
-from collections import Counter, defaultdict
-from difflib import SequenceMatcher
-from typing import Dict, List, Optional
+from typing import Dict, List
 
-from .collector import Collection
-from .indexer import InvertedIndex, Posting
+from . import Collection, InvertedIndex
+from .indexer import Posting
 
 
 class WordLexicon:
@@ -27,8 +25,6 @@ class Lexicon:
 
     def __init__(self):
         self.lexicon: Dict[str, WordLexicon] = {}
-        self.matcher: Optional[SequenceMatcher] = None
-        self.terms: Optional[List[str]] = None
 
     def __add_word_lexicon(self, collection_size: int, term: str, postings: List[Posting]):
         self.lexicon[term] = WordLexicon(
@@ -48,22 +44,5 @@ class Lexicon:
     def get_word_lexicon(self, word: str) -> WordLexicon:
         return self.lexicon[word]
 
-    def init_query_mode(self):
-        self.matcher = SequenceMatcher(isjunk=None, autojunk=False)
-
-    def expand_query(self, query_words: List[str]) -> List[str]:
-        cutoff = 0.8
-        exact_words = set(query_words) & set(self.lexicon)
-        approx_words = set(query_words) - exact_words
-        exact_query_words = [w for w in query_words if w not in approx_words]
-        query_expansion = defaultdict(float)
-        for q_word in approx_words:
-            self.matcher.set_seq2(q_word)
-            for term in self.lexicon:
-                self.matcher.set_seq1(term)
-                if self.matcher.real_quick_ratio() >= cutoff and \
-                   self.matcher.quick_ratio() >= cutoff and \
-                   self.matcher.ratio() >= cutoff:
-                    query_expansion[term] += self.matcher.ratio()
-        query_expansion.update(dict(Counter(exact_query_words)))
-        return query_expansion
+    def get_terms(self) -> List[str]:
+        return self.lexicon.keys()

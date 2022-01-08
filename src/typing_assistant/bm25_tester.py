@@ -15,7 +15,7 @@ if __name__ == '__main__':
     tic = time.time()
     bm25 = BM25Okapi(tokenized_corpus)
     print('index', time.time() - tic)
-    n = 1
+    n = 10
     tic = time.time()
     for _ in range(n):
         query = 'running football player player in field across football'
