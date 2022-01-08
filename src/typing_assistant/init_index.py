@@ -3,9 +3,7 @@ import time
 
 import pandas as pd
 
-from .collector import Collection
-from .indexer import InvertedIndex
-from .lex import Lexicon
+from .indexing import Collection, InvertedIndex, Lexicon
 
 
 if __name__ == '__main__':
