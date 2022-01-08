@@ -38,3 +38,17 @@ class Lexicon:
 
     def get_word_lexicon(self, word: str) -> WordLexicon:
         return self.lexicon[word]
+
+    def search_word_lexicon(self, word: str) -> WordLexicon:
+        result = None
+        for term in self.lexicon:
+            if term == word:
+                result = term
+        return self.lexicon[result]
+
+    def approx_search_word_lexicon(self, word: str) -> WordLexicon:
+        result = None
+        for term in self.lexicon:
+            if term == word:
+                result = term
+        return self.lexicon[result]
