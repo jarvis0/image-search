@@ -17,10 +17,10 @@ if __name__ == '__main__':
 
     lexicon.init_query_mode()
     ranker = OkapiBM25Ranker(collection, lexicon)
-    n = 10
+    n = 1
     tic = time.time()
     for _ in range(n):
-        query = 'runnig ftball player in a field'
+        query = 'running football player player in field across football'
         results = ranker.lookup_query(query)
     print('query', (time.time() - tic) / n)
     for text, score in results:

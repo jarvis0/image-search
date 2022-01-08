@@ -24,8 +24,8 @@ class OkapiBM25Ranker:
             for p in word_lexicon.postings:
                 tf[w][p.doc_id] += p.frequency
         scores = defaultdict(int)
-        for doc_id in tf[w]:
-            for w, weight in expanded_query_words.items():
+        for w, weight in expanded_query_words.items():
+            for doc_id in tf[w]:
                 scores[doc_id] += weight * idf[w] * ((self.kappa + 1) * tf[w][doc_id] / (
                     tf[w][doc_id] + self.kappa * (
                         1 - self.beta + self.beta * self.collection.get_doc_length(doc_id) / self.avgdl)))

@@ -1,5 +1,8 @@
+import itertools
 from collections import Counter, defaultdict
 from typing import DefaultDict, List, Tuple
+
+from joblib import Parallel, delayed
 
 from .collector import Collection
 
@@ -20,15 +23,18 @@ class InvertedIndex:
         self.collection: Collection = collection
         self.index: DefaultDict[str, List[Posting]] = defaultdict(list)
 
-    def __index_document(self, doc_id: int):
-        document = self.collection.get_document(doc_id)
+    @staticmethod
+    def __index_document(doc_id, document):
         term_frequencies = Counter(document.tokens)
-        update_dict = {term: self.index[term] + [Posting(doc_id, freq)] for term, freq in term_frequencies.items()}
-        self.index.update(update_dict)
+        partial_term_postings = [(term, [Posting(doc_id, freq)]) for term, freq in term_frequencies.items()]
+        return partial_term_postings
 
     def index_collection(self):
-        for doc_id in self.collection.get_docs_id():
-            self.__index_document(doc_id)
+        map_responses = Parallel(n_jobs=2)(delayed(InvertedIndex.__index_document)(
+            doc_id, self.collection.get_document(doc_id)) for doc_id in self.collection.get_docs_id()
+        )
+        for term, postings in itertools.chain(*map_responses):
+            self.index[term] += postings
 
     def get_items(self) -> List[Tuple[str, List[Posting]]]:
         return self.index.items()
