@@ -7,7 +7,7 @@ from rank_bm25 import BM25Plus
 
 
 if __name__ == '__main__':
-    corpus = pd.read_csv('data/captions.tsv', sep='\t', index_col='id')['caption'].to_list()[: 8]
+    corpus = pd.read_csv('data/captions.tsv', sep='\t', index_col='id')['caption'].to_list()
     print('number of sentences:', len(corpus))
     tic = time.time()
     tokenized_corpus = [tuple(re.findall(r'\w+', doc)) for doc in corpus]
