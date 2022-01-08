@@ -25,6 +25,7 @@ setup(
         'pandas==1.3.4',
         'scipy==1.8.0rc1',
         'nltk==3.6.5',
+        'rank_bm25',
     ],
     extras_require={
         'dev': [
