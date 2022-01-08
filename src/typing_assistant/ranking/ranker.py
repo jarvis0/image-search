@@ -1,12 +1,10 @@
+import pickle
 import re
 import time
 from collections import defaultdict
 from typing import List, Tuple
 
-import pandas as pd
-
-from .collector import Collection
-from .indexer import InvertedIndex, Lexicon
+from ..indexing import Collection, Lexicon
 
 
 class BM25PlusRanker:
@@ -37,20 +35,16 @@ class BM25PlusRanker:
 
 
 if __name__ == '__main__':
-    corpus = pd.read_csv('data/captions.tsv', sep='\t', index_col='id')['caption'].to_dict()
-    print('number of sentences:', len(corpus))
     tic = time.time()
-    collection = Collection()
-    collection.build_collection(corpus)
-    print('build collection', time.time() - tic)
+    with open('data/dumps/collection.pkl', 'rb') as fp:
+        collection = pickle.load(fp)
+    print('load collection', time.time() - tic)
     tic = time.time()
-    inv_index = InvertedIndex(collection)
-    inv_index.index_collection()
-    print('build index', time.time() - tic)
-    tic = time.time()
-    lexicon = inv_index.build_lexicon()
-    print('build lexicon', time.time() - tic)
-    print('inv_index entries', len(lexicon.get_words_lexicon()))
+    with open('data/dumps/lexicon.pkl', 'rb') as fp:
+        lexicon = pickle.load(fp)
+    print('load lexicon', time.time() - tic)
+    print('lexicon entries', len(lexicon.get_words_lexicon()))
+
     tic = time.time()
     ranker = BM25PlusRanker(collection, lexicon)
     query = 'basketball player'

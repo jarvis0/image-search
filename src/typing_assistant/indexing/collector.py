@@ -9,14 +9,14 @@ class Document:
         self.tokens: Optional[List[str]] = None
         self.length: Optional[int] = None
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.text
 
     def tokenize_text(self):
         self.tokens = tuple(re.findall(r'\w+', self.text))
         self.length = len(self.tokens)
 
-    def get_length(self):
+    def get_length(self) -> int:
         return self.length
 
 
@@ -24,8 +24,8 @@ class Collection:
 
     def __init__(self):
         self.documents: Dict[int, Document] = {}
-        self.docs_id: List[int] = None
-        self.n_documents: int = 0
+        self.n_documents: Optional[int] = None
+        self.docs_id: Optional[List[int]] = None
 
     def __add_document(self, doc_id: str, text: str):
         document = Document(text)
