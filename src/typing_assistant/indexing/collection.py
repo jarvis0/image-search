@@ -27,7 +27,7 @@ class Collection:
         self.n_documents: Optional[int] = None
         self.docs_id: Optional[List[int]] = None
 
-    def __add_document(self, doc_id: str, text: str):
+    def __add_document(self, doc_id: int, text: str):
         document = Document(text)
         document.tokenize_text()
         self.documents[doc_id] = document
@@ -41,11 +41,11 @@ class Collection:
     def get_docs_id(self) -> List[int]:
         return self.docs_id
 
-    def get_document(self, doc_id: str) -> Document:
+    def get_document(self, doc_id: int) -> Document:
         return self.documents[doc_id]
 
     def get_size(self) -> int:
         return self.n_documents
 
-    def get_doc_length(self, doc_id: str) -> int:
+    def get_doc_length(self, doc_id: int) -> int:
         return self.documents[doc_id].get_length()

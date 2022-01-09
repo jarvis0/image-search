@@ -1,7 +1,7 @@
 import pickle
 import time
 
-from .ranking import BM25Ranker
+from .ranking import OkapiBM25Ranker
 
 
 if __name__ == '__main__':
@@ -15,10 +15,12 @@ if __name__ == '__main__':
     print('load lexicon', time.time() - tic)
     print('lexicon entries', len(lexicon.get_words_lexicon()))
 
+    ranker = OkapiBM25Ranker(collection, lexicon)
+    n = 10
     tic = time.time()
-    ranker = BM25Ranker(collection, lexicon)
-    query = 'basketball player'
-    results = ranker.lookup_query(query)
-    print('query', time.time() - tic)
+    for _ in range(n):
+        query = 'running football player player in field across football'
+        results = ranker.lookup_query(query)
+    print('query', (time.time() - tic) / n)
     for text, score in results:
         print(score, text)
