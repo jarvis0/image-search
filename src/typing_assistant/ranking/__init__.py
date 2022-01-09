@@ -1,5 +1,5 @@
-from .ranker import BM25Ranker
+from .ranker import OkapiBM25Ranker
 
 __all__ = [
-    'BM25Ranker',
+    'OkapiBM25Ranker',
 ]

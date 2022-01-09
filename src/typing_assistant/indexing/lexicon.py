@@ -1,13 +1,18 @@
 import math
 from typing import Dict, List
 
-from .collector import Collection
-from .indexer import InvertedIndex, Posting
+from . import Collection, InvertedIndex
+from .indexer import Posting
 
 
 class WordLexicon:
 
-    def __init__(self, total_frequency: int, inverse_term_frequency: float, postings: List[Posting]):
+    def __init__(
+        self,
+        total_frequency: int,
+        inverse_term_frequency: float,
+        postings: List[Posting],
+    ):
         self.tot_freq: int = total_frequency
         self.idf: float = inverse_term_frequency
         self.postings: List[Posting] = postings
@@ -24,7 +29,7 @@ class Lexicon:
     def __add_word_lexicon(self, collection_size: int, term: str, postings: List[Posting]):
         self.lexicon[term] = WordLexicon(
             sum(p.frequency for p in postings),
-            math.log((collection_size + 1) / len(postings)),
+            math.log((collection_size - len(postings) + 0.5) / (len(postings) + 0.5) + 1),
             postings,
         )
 
@@ -38,3 +43,6 @@ class Lexicon:
 
     def get_word_lexicon(self, word: str) -> WordLexicon:
         return self.lexicon[word]
+
+    def get_terms(self) -> List[str]:
+        return self.lexicon.keys()
