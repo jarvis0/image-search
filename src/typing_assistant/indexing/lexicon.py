@@ -1,4 +1,5 @@
 import math
+import pickle
 from typing import Dict, List
 
 from . import Collection, InvertedIndex
@@ -23,8 +24,14 @@ class WordLexicon:
 
 class Lexicon:
 
+    DUMP_PATH = 'data/dumps/lexicon.pkl'
+
     def __init__(self):
         self.lexicon: Dict[str, WordLexicon] = {}
+
+    def dump(self):
+        with open(Lexicon.DUMP_PATH, 'wb') as fp:
+            pickle.dump(self, fp)
 
     def __add_word_lexicon(self, collection_size: int, term: str, postings: List[Posting]):
         self.lexicon[term] = WordLexicon(

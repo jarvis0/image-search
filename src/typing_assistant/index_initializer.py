@@ -1,4 +1,3 @@
-import pickle
 import time
 
 import pandas as pd
@@ -24,10 +23,8 @@ if __name__ == '__main__':
 
     print('lexicon entries', len(lexicon.get_words_lexicon()))
     tic = time.time()
-    with open('data/dumps/collection.pkl', 'wb') as fp:
-        pickle.dump(collection, fp)
+    collection.dump()
     print('dump collection', time.time() - tic)
     tic = time.time()
-    with open('data/dumps/lexicon.pkl', 'wb') as fp:
-        pickle.dump(lexicon, fp)
+    lexicon.dump()
     print('dump lexicon', time.time() - tic)
