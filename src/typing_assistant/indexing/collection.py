@@ -23,7 +23,7 @@ class Document:
 
 class Collection:
 
-    DUMP_PATH = 'data/dumps/collection.pkl'
+    DUMP_PATH = 'binaries/collection.pkl'
 
     def __init__(self):
         self.documents: Dict[int, Document] = {}

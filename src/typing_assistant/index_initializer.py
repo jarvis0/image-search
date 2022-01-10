@@ -6,7 +6,7 @@ from .indexing import Collection, InvertedIndex, Lexicon
 
 
 if __name__ == '__main__':
-    corpus = pd.read_csv('data/raw/all_captions.tsv', sep='\t', index_col='id')['caption'].to_dict()
+    corpus = pd.read_csv('data/captions_0.1.tsv', sep='\t', index_col='id')['caption'].to_dict()
     print('number of sentences:', len(corpus))
     tic = time.time()
     collection = Collection()

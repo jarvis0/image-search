@@ -24,7 +24,7 @@ class WordLexicon:
 
 class Lexicon:
 
-    DUMP_PATH = 'data/dumps/lexicon.pkl'
+    DUMP_PATH = 'binaries/lexicon.pkl'
 
     def __init__(self):
         self.lexicon: Dict[str, WordLexicon] = {}
