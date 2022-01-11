@@ -18,7 +18,9 @@ class OkapiBM25Ranker:
 
     def lookup_query(self, query: str) -> List[Tuple[str, float]]:
         query_words = list(re.findall(r'\w+', query))
-        expanded_query_words = self.query_expander.expand_query(query_words)
+        seq_expanded_query_words = self.query_expander.expand_by_sequence(query_words)
+        sem_expanded_query_words = self.query_expander.expand_by_semantics(query_words)
+        expanded_query_words = {**seq_expanded_query_words, **sem_expanded_query_words}
         tf, idf = defaultdict(lambda: defaultdict(int)), {}
         for w in expanded_query_words:
             word_lexicon = self.lexicon.get_word_lexicon(w)
@@ -31,5 +33,5 @@ class OkapiBM25Ranker:
                 scores[doc_id] += weight * idf[w] * ((self.kappa + 1) * tf[w][doc_id] / (
                     tf[w][doc_id] + self.kappa * (
                         1 - self.beta + self.beta * self.collection.get_doc_length(doc_id) / self.avgdl)))
-        sorted_results = list(sorted(scores.items(), key=lambda x: x[1], reverse=True))[: 5]
+        sorted_results = list(sorted(scores.items(), key=lambda x: x[1], reverse=True))[: 10]
         return [(self.collection.get_document(doc_id), score) for doc_id, score in sorted_results]

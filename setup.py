@@ -24,6 +24,7 @@ setup(
         'numpy==1.21.4',
         'pandas==1.3.4',
         'scipy==1.8.0rc1',
+        'fasttext==0.9.2',
         'nltk==3.6.5',
         'rank_bm25',
     ],
