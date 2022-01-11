@@ -24,7 +24,7 @@ class WordLexicon:
 
 class Lexicon:
 
-    DUMP_PATH = 'binaries/lexicon.pkl'
+    DUMP_PATH: str = 'binaries/lexicon.pkl'
 
     def __init__(self):
         self.lexicon: Dict[str, WordLexicon] = {}
@@ -53,3 +53,9 @@ class Lexicon:
 
     def get_terms(self) -> List[str]:
         return self.lexicon.keys()
+
+
+def load_lexicon(lexicon_dump_path) -> Lexicon:
+    with open(lexicon_dump_path, 'rb') as fp:
+        lexicon = pickle.load(fp)
+    return lexicon

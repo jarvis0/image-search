@@ -1,17 +1,15 @@
-import pickle
 import time
 
+from .indexing import load_collection, load_lexicon
 from .ranking import OkapiBM25Ranker
 
 
 if __name__ == '__main__':
     tic = time.time()
-    with open('binaries/collection.pkl', 'rb') as fp:
-        collection = pickle.load(fp)
+    collection = load_collection('binaries/collection.pkl')
     print('load collection', time.time() - tic)
     tic = time.time()
-    with open('binaries/lexicon.pkl', 'rb') as fp:
-        lexicon = pickle.load(fp)
+    lexicon = load_lexicon('binaries/lexicon.pkl')
     print('load lexicon', time.time() - tic)
     print('lexicon entries', len(lexicon.get_words_lexicon()))
 
@@ -19,7 +17,7 @@ if __name__ == '__main__':
     n = 10
     tic = time.time()
     for _ in range(n):
-        query = 'running football player player in field across football'
+        query = 'vanilla and pink sky at sunset near the beach'
         results = ranker.lookup_query(query)
     print('query', (time.time() - tic) / n)
     for text, score in results:

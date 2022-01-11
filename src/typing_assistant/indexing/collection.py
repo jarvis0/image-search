@@ -23,7 +23,7 @@ class Document:
 
 class Collection:
 
-    DUMP_PATH = 'binaries/collection.pkl'
+    DUMP_PATH: str = 'binaries/collection.pkl'
 
     def __init__(self):
         self.documents: Dict[int, Document] = {}
@@ -56,3 +56,9 @@ class Collection:
 
     def get_doc_length(self, doc_id: int) -> int:
         return self.documents[doc_id].get_length()
+
+
+def load_collection(collection_dump_path) -> Collection:
+    with open(collection_dump_path, 'rb') as fp:
+        collection = pickle.load(fp)
+    return collection
