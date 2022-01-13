@@ -42,7 +42,7 @@ class ImagesHandler:
         img = Image.open(BytesIO(raw_image))
         plt.figure()
         plt.imshow(img)
-        #  plt.show()
+        plt.show()
 
     @staticmethod
     async def __draw_images(raw_images: List[bytes]):

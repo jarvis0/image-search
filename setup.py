@@ -25,8 +25,7 @@ setup(
         'pandas==1.3.4',
         'scipy==1.8.0rc1',
         'fasttext==0.9.2',
-        'nltk==3.6.5',
-        'rank_bm25',
+        'streamlit==1.3.1',
     ],
     extras_require={
         'dev': [
