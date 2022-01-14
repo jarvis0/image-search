@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Image Search - query results</title>
+</head>
+<body>
+    <h1>Image Search - query results</h1>
+    <h3>Showing results for "{{ query }}"</h3>
+    <div style="width: 50%; margin: auto">
+        {% for image_url, text, score in query_results %}
+            <img src="{{ image_url }}" height="256px">
+            <figcaption>{{ score }}, {{ text }}</figcaption>
+        {% endfor %}
+    </div>
+</body>
+</html>

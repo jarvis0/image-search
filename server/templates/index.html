@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Image Search</title>
+</head>
+<body>
+    <h1>Image Search</h1>
+    <form action="/query" method="post">
+        <label for="site-search">Insert a caption:</label>
+        <input type="search" name="input_query" id="input_search" autofocus size="130" onkeyup="myFunction()">
+        <button>Confirm</button>
+    </form>
+    <p id="results_preview"></p>
+
+    <script>
+        function myFunction() {
+           var x = document.getElementById("input_search");
+           document.getElementById("results_preview").innerHTML = "You are searching for: " + x.value;
+        }
+    </script>
+</body>
+</html>

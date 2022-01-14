@@ -48,6 +48,9 @@ class ImagesHandler:
     async def __draw_images(raw_images: List[bytes]):
         await asyncio.gather(*[ImagesHandler.__draw_image(image) for image in raw_images])
 
+    def get_url(self, doc_id: int) -> str:
+        return self.images_url[doc_id]
+
     def download_images(self, doc_ids: List[int]) -> List[bytes]:
         urls = [self.images_url[doc_id] for doc_id in doc_ids]
         return asyncio.run(ImagesHandler.get_images(urls))

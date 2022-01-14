@@ -25,7 +25,7 @@ setup(
         'pandas==1.3.4',
         'scipy==1.8.0rc1',
         'fasttext==0.9.2',
-        'streamlit==1.3.1',
+        'flask==2.0.2',
     ],
     extras_require={
         'dev': [
