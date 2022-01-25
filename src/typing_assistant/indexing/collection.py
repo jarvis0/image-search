@@ -1,5 +1,6 @@
 import pickle
 import re
+from os.path import join
 from typing import Dict, List, Optional
 
 
@@ -30,8 +31,8 @@ class Collection:
         self.n_documents: Optional[int] = None
         self.docs_id: Optional[List[int]] = None
 
-    def dump(self):
-        with open(Collection.DUMP_PATH, 'wb') as fp:
+    def dump(self, root: str):
+        with open(join(root, Collection.DUMP_PATH), 'wb') as fp:
             pickle.dump(self, fp)
 
     def __add_document(self, doc_id: int, text: str):
@@ -58,7 +59,7 @@ class Collection:
         return self.documents[doc_id].get_length()
 
 
-def load_collection(collection_dump_path) -> Collection:
-    with open(collection_dump_path, 'rb') as fp:
+def load_collection(root: str) -> Collection:
+    with open(join(root, Collection.DUMP_PATH), 'rb') as fp:
         collection = pickle.load(fp)
     return collection
