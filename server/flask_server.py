@@ -16,7 +16,7 @@ def index():
 
 @app.route('/partial_query', methods=['POST'])
 def partial_query():
-    partial_query = str(escape(request.get_json()['partial_query']))
+    partial_query = str(escape(request.form.get('partial_query')))
     query_results = ranker.lookup_query(partial_query)
     query_results = [text.text for _, text, _ in query_results]
     response = {'query_results': query_results}

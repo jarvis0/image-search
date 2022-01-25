@@ -8,10 +8,14 @@
     <h1>Image Search - query results</h1>
     <h3>Showing results for "{{ query }}"</h3>
     <div style="width: 50%; margin: auto">
-        {% for image_url, text, score in query_results %}
-            <img src="{{ image_url }}" height="256px">
-            <figcaption>{{ score }}, {{ text }}</figcaption>
-        {% endfor %}
+        <table>
+            {% for image_url, text, score in query_results %}
+                <tr>
+                    <td><img src="{{ image_url }}" height="256px"></td>
+                    <td><figcaption>{{ score }}, {{ text }}</figcaption></td>
+                </tr>
+            {% endfor %}
+        </table>
     </div>
 </body>
 </html>
