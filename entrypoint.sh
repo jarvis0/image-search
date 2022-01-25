@@ -1,0 +1,1 @@
+python -m typing_assistant.app_web

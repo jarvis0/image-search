@@ -43,6 +43,8 @@ else
 	@echo ">>> ERROR: Conda not found.\n"
 endif
 
+up:
+	bash entrypoint.sh
 
 ## Update project version ($increment=[major|minor|patch])
 version:
