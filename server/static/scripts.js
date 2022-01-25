@@ -19,13 +19,10 @@ function autocomplete(inp, arr) {
         b.innerHTML += arr[i];
         /*insert a input field that will hold the current array item's value:*/
         b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
-        console.log(arr[i]);
-        console.log(b);
         /*execute a function when someone clicks on the item value (DIV element):*/
         b.addEventListener("click", function(e) {
             /*insert the value for the autocomplete text field:*/
-            console.log(b);
-            inp.value = b.getElementsByTagName("input")[0].value;
+            inp.value = this.getElementsByTagName("input")[0].value;
             /*close the list of autocompleted values,
             (or any other open lists of autocompleted values:*/
             closeAllLists();
@@ -53,11 +50,14 @@ function autocomplete(inp, arr) {
             e.preventDefault();
             if (currentFocus > -1) {
                 /*and simulate a click on the "active" item:*/
-                if (x) x[currentFocus].click();
+                if (x) {
+                    x[currentFocus].click();
+                    currentFocus = -1
+                }
             }
-            //else if (currentFocus == -1) {
-            //    document.getElementById("query_form").submit()
-            //}
+            else if (currentFocus == -1) {
+                document.getElementById("query_form").submit()
+            }
         }
     });
     function addActive(x) {
