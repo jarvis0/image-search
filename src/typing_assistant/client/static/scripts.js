@@ -94,14 +94,29 @@ function autocomplete(inp, arr) {
 
 /*execute a function when someone writes in the text field:*/
 var timer = 0;
-$("#input_search").on("input", function() {
+$("#query").on("input", function() {
     partial_query = $(this).val();
     if (timer) {
         clearTimeout(timer);
     }
     timer = setTimeout(function() {
-        $.post("/partial_query", {"partial_query": partial_query}).done(function(response) {
-            autocomplete(document.getElementById("input_search"), response.query_results)
+        $.post("/query_partially", {"partial_query": partial_query}).done(function(response) {
+            autocomplete(document.getElementById("query"), response.partial_query_results);
+        });
+    }, 300);
+});
+
+/*execute a function when someone writes in the text field:*/
+var timer = 0;
+$("#query").on("input", function() {
+    partial_query = $(this).val();
+    if (partial_query.slice(-1) != ' ') return false;
+    if (timer) {
+        clearTimeout(timer);
+    }
+    timer = setTimeout(function() {
+        $.post("/predict_next_word", {"partial_query": partial_query}).done(function(response) {
+            console.log(response.next_word_prediction);
         });
     }, 300);
 });

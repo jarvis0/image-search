@@ -2,6 +2,7 @@ import time
 
 import pandas as pd
 
+from .config import config
 from .indexing import Collection, ImagesHandler, InvertedIndex, Lexicon
 
 
@@ -29,11 +30,11 @@ if __name__ == '__main__':
 
     print('lexicon entries', len(lexicon.get_words_lexicon()))
     tic = time.time()
-    collection.dump()
+    collection.dump(config.ROOT)
     print('dump collection', time.time() - tic)
     tic = time.time()
-    lexicon.dump()
+    lexicon.dump(config.ROOT)
     print('dump lexicon', time.time() - tic)
     tic = time.time()
-    images_handler.dump()
+    images_handler.dump(config.ROOT)
     print('dump images', time.time() - tic)

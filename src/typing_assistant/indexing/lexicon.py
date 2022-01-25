@@ -1,5 +1,6 @@
 import math
 import pickle
+from os.path import join
 from typing import Dict, List
 
 from . import Collection, InvertedIndex
@@ -29,8 +30,8 @@ class Lexicon:
     def __init__(self):
         self.lexicon: Dict[str, WordLexicon] = {}
 
-    def dump(self):
-        with open(Lexicon.DUMP_PATH, 'wb') as fp:
+    def dump(self, root: str):
+        with open(join(root, Lexicon.DUMP_PATH), 'wb') as fp:
             pickle.dump(self, fp)
 
     def __add_word_lexicon(self, collection_size: int, term: str, postings: List[Posting]):
@@ -55,7 +56,7 @@ class Lexicon:
         return self.lexicon.keys()
 
 
-def load_lexicon(lexicon_dump_path) -> Lexicon:
-    with open(lexicon_dump_path, 'rb') as fp:
+def load_lexicon(root: str) -> Lexicon:
+    with open(join(root, Lexicon.DUMP_PATH), 'rb') as fp:
         lexicon = pickle.load(fp)
     return lexicon

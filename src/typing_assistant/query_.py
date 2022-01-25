@@ -1,22 +1,14 @@
 import time
 
-from .indexing import load_collection, load_images_handler, load_lexicon
+from .config import config
+from .indexing import indexes_loader
 from .ranking import OkapiBM25Ranker
 
 
 if __name__ == '__main__':
-    tic = time.time()
-    collection = load_collection('binaries/collection.pkl')
-    print('load collection', time.time() - tic)
-    tic = time.time()
-    lexicon = load_lexicon('binaries/lexicon.pkl')
-    print('load lexicon', time.time() - tic)
-    print('lexicon entries', len(lexicon.get_words_lexicon()))
-    tic = time.time()
-    images_handler = load_images_handler('binaries/images_handler.pkl')
-    print('load images handler', time.time() - tic)
-
+    collection, lexicon, images_handler = indexes_loader(config.ROOT)
     ranker = OkapiBM25Ranker(collection, lexicon)
+
     n = 1
     tic = time.time()
     for _ in range(n):

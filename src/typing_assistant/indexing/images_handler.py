@@ -1,6 +1,7 @@
 import asyncio
 import pickle
 from io import BytesIO
+from os.path import join
 from typing import Dict, List
 
 from PIL import Image
@@ -17,8 +18,8 @@ class ImagesHandler:
     def __init__(self):
         self.images_url: Dict[int, str] = None
 
-    def dump(self):
-        with open(ImagesHandler.DUMP_PATH, 'wb') as fp:
+    def dump(self, root: str):
+        with open(join(root, ImagesHandler.DUMP_PATH), 'wb') as fp:
             pickle.dump(self, fp)
 
     def set_images_url(self, images_url: Dict[int, str]):
@@ -59,7 +60,7 @@ class ImagesHandler:
         asyncio.run(ImagesHandler.__draw_images(images))
 
 
-def load_images_handler(images_handler_dump_path) -> ImagesHandler:
-    with open(images_handler_dump_path, 'rb') as fp:
+def load_images_handler(root: str) -> ImagesHandler:
+    with open(join(root, ImagesHandler.DUMP_PATH), 'rb') as fp:
         images_handler = pickle.load(fp)
     return images_handler
