@@ -26,6 +26,8 @@ setup(
         'scipy==1.8.0rc1',
         'fasttext==0.9.2',
         'flask==2.0.2',
+        'getch==1.0',
+        'blessings==1.7',
     ],
     extras_require={
         'dev': [

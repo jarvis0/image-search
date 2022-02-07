@@ -1,0 +1,17 @@
+{
+    "num_jobs": 1,
+    "regex": "\\w+",
+    "special_characters": {
+        "escape": "\n",
+        "backspace": "\u007f",
+        "tab": "\t",
+        "space": " ",
+        "empty": ""
+    },
+    "max_retrieved_captions": 10,
+    "sentence_completion_threshold": 0.72,
+    "word_completion_threshold": 0.66,
+    "word_correction_predictions": 1,
+    "word_prediction_predictions": 1,
+    "word_completion_predictions": 1
+}
