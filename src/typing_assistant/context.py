@@ -1,5 +1,4 @@
 import json
-from multiprocessing import Pool
 from typing import Any, Dict
 
 from blessings import Terminal
@@ -9,21 +8,16 @@ class Context():
 
     def __init__(self, config_file: str):
         with open(config_file) as fp:
-            self.__configs = json.load(fp)
-        self.__pool = Pool(self.__configs['num_jobs'])
-        self.__term = Terminal()
+            self.__configs: Dict[str, Any] = json.load(fp)
+        self.__term: Terminal = Terminal()
 
     @property
-    def configs(self) -> Dict[str, Any]:
-        return self.__configs
+    def max_results(self) -> int:
+        return self.__configs['max_results']
 
     @property
     def special_characters(self) -> Dict[str, str]:
         return self.__configs['special_characters']
-
-    @property
-    def pool(self) -> Pool:
-        return self.__pool
 
     @property
     def term(self) -> Terminal:

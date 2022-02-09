@@ -1,6 +1,5 @@
 {
     "num_jobs": 1,
-    "regex": "\\w+",
     "special_characters": {
         "escape": "\n",
         "backspace": "\u007f",
@@ -8,7 +7,7 @@
         "space": " ",
         "empty": ""
     },
-    "max_retrieved_captions": 10,
+    "max_results": 3,
     "sentence_completion_threshold": 0.72,
     "word_completion_threshold": 0.66,
     "word_correction_predictions": 1,

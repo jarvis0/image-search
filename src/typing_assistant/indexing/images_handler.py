@@ -2,7 +2,7 @@ import asyncio
 import pickle
 from io import BytesIO
 from os.path import join
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from PIL import Image
 
@@ -39,15 +39,16 @@ class ImagesHandler:
             return await asyncio.gather(*[ImagesHandler.get_image(session, url) for url in urls])
 
     @staticmethod
-    async def __draw_image(raw_image: bytes):
-        img = Image.open(BytesIO(raw_image))
+    async def __draw_image(image: bytes, caption: str):
+        img = Image.open(BytesIO(image))
         plt.figure()
+        plt.title(caption, wrap=True)
         plt.imshow(img)
         plt.show()
 
     @staticmethod
-    async def __draw_images(raw_images: List[bytes]):
-        await asyncio.gather(*[ImagesHandler.__draw_image(image) for image in raw_images])
+    async def __draw_images(images_captions: List[Tuple[bytes, str]]):
+        await asyncio.gather(*[ImagesHandler.__draw_image(image, caption) for image, caption in images_captions])
 
     def get_url(self, doc_id: int) -> str:
         return self.images_url[doc_id]
@@ -56,8 +57,8 @@ class ImagesHandler:
         urls = [self.images_url[doc_id] for doc_id in doc_ids]
         return asyncio.run(ImagesHandler.get_images(urls))
 
-    def draw_images(self, images: List[bytes]):
-        asyncio.run(ImagesHandler.__draw_images(images))
+    def draw_images(self, images_captions: List[Tuple[bytes, str]]):
+        asyncio.run(ImagesHandler.__draw_images(images_captions))
 
 
 def load_images_handler(root: str) -> ImagesHandler:

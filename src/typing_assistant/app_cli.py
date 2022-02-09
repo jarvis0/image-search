@@ -1,4 +1,5 @@
 from typing import Any, Dict, List
+
 from blessings import Terminal
 
 import getch
@@ -47,11 +48,11 @@ class CLIApp():
             )
         return query
 
-    def __init__(self, ctx: Context):
+    def __init__(self, context: Context):
         self.__term: Terminal = ctx.term
         self.__special_characters: Dict[str, Any] = ctx.special_characters
         collection, lexicon, images_handler = load_indexes(config.ROOT)
-        self.__ranker: OkapiBM25Ranker = OkapiBM25Ranker(collection, lexicon)
+        self.__ranker: OkapiBM25Ranker = OkapiBM25Ranker(context, collection, lexicon)
         self.__images_handler: ImagesHandler = images_handler
 
     def __is_allowed(self, char: str) -> bool:
@@ -101,11 +102,11 @@ class CLIApp():
 
     def __print_suggestions(self, query: str, suggestions: dict):
         query_length = len(query)
-        words = None
+        words = ''
         if bool(suggestions['query_completion']):
             print(self.__term.move(1, 0) + self.__term.cyan)
             for _, query_completion, _ in suggestions['query_completion']:
-                print(self.__special_characters['tab'] + query_completion.text)
+                print(self.__special_characters['tab'] + query_completion)
             print(self.__term.normal)
         if bool(suggestions['word_correction']):
             prefix = self.__term.move(1, query_length - len(words[-1]) + 8) + self.__term.green
@@ -122,7 +123,9 @@ class CLIApp():
 
     def __show_images(self, query_completions: List):
         images = self.__images_handler.download_images([doc_id for doc_id, _, _ in query_completions])
-        self.__images_handler.draw_images(images)
+        captions = [caption for _, caption, _ in query_completions]
+        images_captions = list(zip(images, captions))
+        self.__images_handler.draw_images(images_captions)
 
     def run(self):
         self.__init_insertion_print()
