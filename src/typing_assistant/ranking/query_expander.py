@@ -23,7 +23,7 @@ class QueryExpander:
         self.semantic_model: ft.FastText = ft.load_model(QueryExpander.SEMANTIC_MODEL_PATH)
 
     def expand_by_sequence(self, query_words: List[str]) -> Dict[str, float]:
-        unknown_words = set(query_words) - set(self.terms)
+        unknown_words = {*query_words} - {*self.terms}
         known_query_words = [w for w in query_words if w not in unknown_words]
         query_expansion: DefaultDict[str, float] = defaultdict(float)
         for q_word in unknown_words:
@@ -38,7 +38,7 @@ class QueryExpander:
         return query_expansion
 
     def expand_by_semantics(self, query_words: List[str]) -> Dict[str, float]:
-        unknown_words = set(query_words) - set(self.terms)
+        unknown_words = {*query_words} - {*self.terms}
         known_query_words = [w for w in query_words if w not in unknown_words]
         query_expansion: DefaultDict[str, float] = defaultdict(float)
         for q_word in known_query_words:

@@ -65,7 +65,7 @@ class Collection:
         for doc_id in corpus:
             self.__add_document(doc_id, corpus[doc_id])
         self.__n_documents = len(self.__documents)
-        self.__docs_id = list(self.__documents.keys())
+        self.__docs_id = [*self.__documents.keys()]
 
     def dump(self, root: str):
         with open(join(root, Collection.DUMP_PATH), 'wb') as fp:

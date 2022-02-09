@@ -38,13 +38,13 @@ class Lexicon:
         )
 
     def get_words_lexicon(self) -> List[WordLexicon]:
-        return list(self.lexicon.values())
+        return [*self.lexicon.values()]
 
     def get_word_lexicon(self, word: str) -> WordLexicon:
         return self.lexicon[word]
 
     def get_terms(self) -> List[str]:
-        return list(self.lexicon.keys())
+        return [*self.lexicon.keys()]
 
     def build_lexicon(self, collection: Collection, inv_index: InvertedIndex):
         collection_size = collection.size

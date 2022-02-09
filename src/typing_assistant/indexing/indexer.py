@@ -33,7 +33,7 @@ class InvertedIndex:
 
     @property
     def items(self) -> List[Tuple[str, List[Posting]]]:
-        return list(self.__inv_index.items())
+        return [*self.__inv_index.items()]
 
     @staticmethod
     def __index_document(doc_id: int, document: Document):

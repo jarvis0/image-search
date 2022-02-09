@@ -124,7 +124,7 @@ class CLIApp():
     def __show_images(self, query_completions: List):
         images = self.__images_handler.download_images([doc_id for doc_id, _, _ in query_completions])
         captions = [caption for _, caption, _ in query_completions]
-        images_captions = list(zip(images, captions))
+        images_captions = [*zip(images, captions)]
         self.__images_handler.draw_images(images_captions)
 
     def run(self):
