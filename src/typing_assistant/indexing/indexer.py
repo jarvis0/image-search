@@ -42,7 +42,7 @@ class InvertedIndex:
         return [*self.__inv_index.items()]
 
     def index_collection(self):
-        map_responses = Parallel(n_jobs=-1)(delayed(InvertedIndex.__index_document)(
+        map_responses = Parallel(n_jobs=4)(delayed(InvertedIndex.__index_document)(
             doc_id,
             self.__collection.get_document(doc_id),
         ) for doc_id in self.__collection.docs_id)
