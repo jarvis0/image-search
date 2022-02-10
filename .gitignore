@@ -132,3 +132,7 @@ dmypy.json
 .vscode
 .DS_Store
 scripts/**/*.bin
+binaries/0.5
+binaries/1
+data/captions_0.5.tsv
+data/captions_1.tsv
