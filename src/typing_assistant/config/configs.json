@@ -1,5 +1,4 @@
 {
-    "num_jobs": 1,
     "special_characters": {
         "escape": "\n",
         "backspace": "\u007f",
@@ -7,9 +6,11 @@
         "space": " ",
         "empty": ""
     },
-    "max_results": 3,
-    "sentence_completion_threshold": 0.72,
-    "word_completion_threshold": 0.66,
+    "max_completions": 10,
+    "max_images": 3,
+    "sequencediff_cutoff": 0.8,
+    "semantic_cutoff": 0.7,
+    "n_semantic_neighbors": 1,
     "word_correction_predictions": 1,
     "word_prediction_predictions": 1,
     "word_completion_predictions": 1

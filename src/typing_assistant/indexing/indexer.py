@@ -31,18 +31,18 @@ class InvertedIndex:
         self.__collection: Collection = collection
         self.__inv_index: DefaultDict[str, List[Posting]] = defaultdict(list)
 
-    @property
-    def items(self) -> List[Tuple[str, List[Posting]]]:
-        return [*self.__inv_index.items()]
-
     @staticmethod
     def __index_document(doc_id: int, document: Document):
         term_frequencies: Dict[str, int] = Counter(document.tokens)
         partial_term_postings = [(term, [Posting(doc_id, freq)]) for term, freq in term_frequencies.items()]
         return partial_term_postings
 
+    @property
+    def items(self) -> List[Tuple[str, List[Posting]]]:
+        return [*self.__inv_index.items()]
+
     def index_collection(self):
-        map_responses = Parallel(n_jobs=4)(delayed(InvertedIndex.__index_document)(
+        map_responses = Parallel(n_jobs=-1)(delayed(InvertedIndex.__index_document)(
             doc_id,
             self.__collection.get_document(doc_id),
         ) for doc_id in self.__collection.docs_id)

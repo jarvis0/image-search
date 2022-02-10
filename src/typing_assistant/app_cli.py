@@ -151,6 +151,6 @@ class CLIApp():
 
 
 if __name__ == '__main__':
-    ctx = Context('src/typing_assistant/config/configs.json')
+    ctx = Context(config.ROOT)
     cli_app = CLIApp(ctx)
     cli_app.run()
