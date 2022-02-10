@@ -1,25 +1,36 @@
 import pickle
 import re
 from os.path import join
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 
 class Document:
 
+    REGEX: str = r'\w+'
+
     def __init__(self, text: str):
-        self.text: str = text
-        self.tokens: Optional[List[str]] = None
-        self.length: Optional[int] = None
+        self.__text: str = text
+        self.__tokens: List[str]
+        self.__length: int
 
     def __repr__(self) -> str:
-        return self.text
+        return self.__text
+
+    @property
+    def text(self) -> str:
+        return self.__text
+
+    @property
+    def tokens(self) -> List[str]:
+        return self.__tokens
+
+    @property
+    def length(self) -> int:
+        return self.__length
 
     def tokenize_text(self):
-        self.tokens = tuple(re.findall(r'\w+', self.text))
-        self.length = len(self.tokens)
-
-    def get_length(self) -> int:
-        return self.length
+        self.__tokens = tuple(re.findall(Document.REGEX, self.__text))
+        self.__length = len(self.__tokens)
 
 
 class Collection:
@@ -27,36 +38,38 @@ class Collection:
     DUMP_PATH: str = 'binaries/collection.pkl'
 
     def __init__(self):
-        self.documents: Dict[int, Document] = {}
-        self.n_documents: Optional[int] = None
-        self.docs_id: Optional[List[int]] = None
+        self.__documents: Dict[int, Document] = {}
+        self.__docs_id: List[int]
+        self.__n_documents: int
 
-    def dump(self, root: str):
-        with open(join(root, Collection.DUMP_PATH), 'wb') as fp:
-            pickle.dump(self, fp)
+    @property
+    def docs_id(self) -> List[int]:
+        return self.__docs_id
+
+    @property
+    def size(self) -> int:
+        return self.__n_documents
 
     def __add_document(self, doc_id: int, text: str):
         document = Document(text)
         document.tokenize_text()
-        self.documents[doc_id] = document
+        self.__documents[doc_id] = document
+
+    def get_document(self, doc_id: int) -> Document:
+        return self.__documents[doc_id]
+
+    def get_doc_length(self, doc_id: int) -> int:
+        return self.__documents[doc_id].length
 
     def build_collection(self, corpus: Dict[int, str]):
         for doc_id in corpus:
             self.__add_document(doc_id, corpus[doc_id])
-        self.n_documents = len(self.documents)
-        self.docs_id = list(self.documents.keys())
+        self.__n_documents = len(self.__documents)
+        self.__docs_id = [*self.__documents.keys()]
 
-    def get_docs_id(self) -> List[int]:
-        return self.docs_id
-
-    def get_document(self, doc_id: int) -> Document:
-        return self.documents[doc_id]
-
-    def get_size(self) -> int:
-        return self.n_documents
-
-    def get_doc_length(self, doc_id: int) -> int:
-        return self.documents[doc_id].get_length()
+    def dump(self, root: str):
+        with open(join(root, Collection.DUMP_PATH), 'wb') as fp:
+            pickle.dump(self, fp)
 
 
 def load_collection(root: str) -> Collection:

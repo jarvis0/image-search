@@ -1,16 +1,17 @@
-import argparse
 from os.path import join
 
 from flask import Flask, escape, render_template, request
 
 from .config import config
+from .context import Context
 from .indexing.indexes_loader import load_indexes
 from .ranking import OkapiBM25Ranker
 
 
 def create_web_app():
+    context = Context(config.ROOT)
     collection, lexicon, images_handler = load_indexes(config.ROOT)
-    ranker = OkapiBM25Ranker(collection, lexicon)
+    ranker = OkapiBM25Ranker(context, collection, lexicon)
 
     web_app = Flask(
         __name__,
@@ -32,7 +33,7 @@ def create_web_app():
     def query_partially():
         partial_query = str(escape(request.form.get('partial_query')))
         query_results = ranker.lookup_query(partial_query)
-        query_results = [text.text for _, text, _ in query_results]
+        query_results = [text for _, text, _ in query_results]
         response = {'partial_query_results': query_results}
         return response
 
@@ -47,15 +48,8 @@ def create_web_app():
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-hs', '--host', action='store', default='localhost')
-    parser.add_argument('-p', '--port', action='store', default='8080')
-    parser.add_argument('-d', '--debug', action='store_true', default=False)
-    args = parser.parse_args()
-
     web_app = create_web_app()
     web_app.run(
-        host=args.host,
-        port=int(args.port),
-        debug=args.debug,
+        host=config.HOST,
+        port=config.PORT,
     )

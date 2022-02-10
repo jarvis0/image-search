@@ -12,7 +12,7 @@ def load_indexes(root: str) -> Tuple[Collection, Lexicon, ImagesHandler]:
     tic = time.time()
     lexicon = load_lexicon(root)
     print('load lexicon', time.time() - tic)
-    print('lexicon entries', len(lexicon.get_words_lexicon()))
+    print('lexicon entries', len(lexicon.terms_lexicon))
     tic = time.time()
     images_handler = load_images_handler(root)
     print('load images handler', time.time() - tic)
