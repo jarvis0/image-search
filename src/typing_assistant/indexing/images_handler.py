@@ -17,10 +17,6 @@ class ImagesHandler:
 
     DUMP_PATH: str = 'binaries/images_handler.pkl'
 
-    def __init__(self, context: Context):
-        self.__max_images = context.max_images
-        self.__images_url: Dict[int, str]
-
     @staticmethod
     async def get_image(session: aiohttp.ClientSession, url: str) -> Optional[bytes]:
         try:
@@ -46,6 +42,10 @@ class ImagesHandler:
     @staticmethod
     async def __draw_images(images_captions: List[Tuple[bytes, str]]):
         await asyncio.gather(*[ImagesHandler.__draw_image(image, caption) for image, caption in images_captions])
+
+    def __init__(self, context: Context):
+        self.__max_images = context.max_images
+        self.__images_url: Dict[int, str]
 
     @property
     def images_url(self) -> Dict[int, str]:
