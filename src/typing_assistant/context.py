@@ -23,6 +23,10 @@ class Context():
         return self.__term
 
     @property
+    def stop_terms_fraction(self) -> float:
+        return self.__configs['stop_terms_fraction']
+
+    @property
     def max_completions(self) -> int:
         return self.__configs['max_completions']
 

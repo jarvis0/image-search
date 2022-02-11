@@ -3,8 +3,11 @@ import pickle
 from os.path import join
 from typing import Dict, List
 
+import nltk
+
 from . import Collection, InvertedIndex
 from .indexer import Posting
+from ..context import Context
 
 
 class TermLexicon:
@@ -39,8 +42,9 @@ class Lexicon:
 
     DUMP_PATH: str = 'binaries/lexicon.pkl'
 
-    def __init__(self):
+    def __init__(self, context: Context):
         self.__lexicon: Dict[str, TermLexicon] = {}
+        self.__stop_terms_fraction: float = context.stop_terms_fraction
 
     @property
     def terms(self) -> List[str]:
@@ -57,10 +61,23 @@ class Lexicon:
             postings,
         )
 
+    def __remove_stop_terms(self):
+        n_stop_terms = int(self.__stop_terms_fraction * len(self.__lexicon))
+        stop_terms = {
+            x[0] for x in sorted(
+                self.__lexicon.items(),
+                key=lambda x: x[1].tot_freq,
+                reverse=True,
+            )[: n_stop_terms]
+        }
+        nltk.download('stopwords', quiet=True)
+        for stop_term in stop_terms & {*nltk.corpus.stopwords.words('english')}:
+            del self.__lexicon[stop_term]
+
     def build_lexicon(self, collection: Collection, inv_index: InvertedIndex):
-        collection_size = collection.size
         for term, postings in inv_index.items:
-            self.__add_word_lexicon(collection_size, term, postings)
+            self.__add_word_lexicon(collection.size, term, postings)
+        self.__remove_stop_terms()
 
     def get_word_lexicon(self, word: str) -> TermLexicon:
         return self.__lexicon[word]
