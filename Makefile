@@ -46,6 +46,15 @@ endif
 up:
 	bash entrypoint.sh
 
+init: 
+	python -m typing_assistant.app_init
+
+cli:
+	python -m typing_assistant.app_cli
+
+web:
+	python -m typing_assistant.app_web
+
 ## Update project version ($increment=[major|minor|patch])
 version:
 ifeq ($(shell git branch | grep \* | cut -d ' ' -f2), main)

@@ -21,7 +21,7 @@ if __name__ == '__main__':
     inv_index.index_collection()
     print('build index', time.time() - tic)
     tic = time.time()
-    lexicon = Lexicon(context)
+    lexicon = Lexicon()
     lexicon.build_lexicon(collection, inv_index)
     print('build lexicon', time.time() - tic)
     tic = time.time()

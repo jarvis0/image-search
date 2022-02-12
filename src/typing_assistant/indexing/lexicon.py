@@ -5,7 +5,6 @@ from typing import Dict, List
 
 from . import Collection, InvertedIndex
 from .indexer import Posting
-from ..context import Context
 
 
 class TermLexicon:
@@ -40,7 +39,7 @@ class Lexicon:
 
     DUMP_PATH: str = 'binaries/lexicon.pkl'
 
-    def __init__(self, context: Context):
+    def __init__(self):
         self.__lexicon: Dict[str, TermLexicon] = {}
 
     @property
