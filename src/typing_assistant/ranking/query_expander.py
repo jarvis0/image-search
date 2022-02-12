@@ -1,6 +1,6 @@
 from collections import Counter, defaultdict
 from difflib import SequenceMatcher
-from typing import DefaultDict, Dict, List
+from typing import DefaultDict, Dict, List, Set
 
 import fasttext as ft
 
@@ -20,12 +20,14 @@ class QueryExpander:
         self.__semantic_cutoff: float = context.semantic_cutoff
         self.__n_semantic_neighbors: int = context.n_semantic_neighbors
         self.__terms: List[str] = lexicon.terms
+        self.__stop_terms: Set[str] = lexicon.stop_terms
         self.__matcher: SequenceMatcher = SequenceMatcher(isjunk=None, autojunk=False)
         self.__semantic_model: ft.FastText = ft.load_model(QueryExpander.SEMANTIC_MODEL_PATH)
 
     def expand_by_sequence(self, query_terms: List[str]) -> Dict[str, float]:
-        unknown_terms = {*query_terms} - {*self.__terms}
-        known_query_terms = [w for w in query_terms if w not in unknown_terms]
+        filtered_query_terms = {*query_terms} - self.__stop_terms
+        unknown_terms = filtered_query_terms - {*self.__terms}
+        known_query_terms = [w for w in filtered_query_terms if w not in unknown_terms]
         query_expansion: DefaultDict[str, float] = defaultdict(float)
         for q_term in unknown_terms:
             self.__matcher.set_seq2(q_term)
@@ -39,8 +41,9 @@ class QueryExpander:
         return query_expansion
 
     def expand_by_semantics(self, query_terms: List[str]) -> Dict[str, float]:
-        unknown_terms = {*query_terms} - {*self.__terms}
-        known_query_terms = [w for w in query_terms if w not in unknown_terms]
+        filtered_query_terms = {*query_terms} - self.__stop_terms
+        unknown_terms = filtered_query_terms - {*self.__terms}
+        known_query_terms = [w for w in filtered_query_terms if w not in unknown_terms]
         query_expansion: DefaultDict[str, float] = defaultdict(float)
         for q_term in known_query_terms:
             for confidence, neighbor in self.__semantic_model.get_nearest_neighbors(

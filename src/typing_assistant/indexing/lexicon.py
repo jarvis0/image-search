@@ -54,6 +54,10 @@ class Lexicon:
     def terms_lexicon(self) -> List[TermLexicon]:
         return [*self.__lexicon.values()]
 
+    @property
+    def stop_terms(self) -> Set[str]:
+        return self.__stop_terms
+
     def __add_term_lexicon(self, collection_size: int, term: str, postings: List[Posting]):
         self.__lexicon[term] = TermLexicon(
             sum(p.frequency for p in postings),
