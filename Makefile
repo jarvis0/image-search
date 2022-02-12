@@ -46,7 +46,7 @@ endif
 up:
 	bash entrypoint.sh
 
-init: 
+init:
 	python -m typing_assistant.app_init
 
 cli:

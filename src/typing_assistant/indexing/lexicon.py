@@ -1,10 +1,13 @@
 import math
 import pickle
 from os.path import join
-from typing import Dict, List
+from typing import Dict, List, Set
+
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 from . import Collection, InvertedIndex
 from .indexer import Posting
+from ..context import Context
 
 
 class TermLexicon:
@@ -38,9 +41,14 @@ class TermLexicon:
 class Lexicon:
 
     DUMP_PATH: str = 'binaries/lexicon.pkl'
+    REGEX: str = r'[a-z]+'
 
-    def __init__(self):
+    def __init__(self, context: Context):
         self.__lexicon: Dict[str, TermLexicon] = {}
+        self.__en_stop_terms: Set[str] = context.en_stop_terms
+        self.__stop_terms_fraction: float = context.stop_terms_fraction
+        self.__stop_terms: Set[str]
+        self.__unigrams: Dict[str, float]
 
     @property
     def terms(self) -> List[str]:
@@ -50,6 +58,10 @@ class Lexicon:
     def terms_lexicon(self) -> List[TermLexicon]:
         return [*self.__lexicon.values()]
 
+    @property
+    def stop_terms(self) -> Set[str]:
+        return self.__stop_terms
+
     def __add_term_lexicon(self, collection_size: int, term: str, postings: List[Posting]):
         self.__lexicon[term] = TermLexicon(
             sum(p.frequency for p in postings),
@@ -57,9 +69,33 @@ class Lexicon:
             postings,
         )
 
+    def __remove_stop_terms(self):
+        n_stop_terms = int(self.__stop_terms_fraction * len(self.__lexicon))
+        self.__stop_terms = {
+            x[0] for x in sorted(
+                self.__lexicon.items(),
+                key=lambda x: x[1].tot_freq,
+                reverse=True,
+            )[: n_stop_terms]
+        } & self.__en_stop_terms
+        for stop_term in self.__stop_terms:
+            del self.__lexicon[stop_term]
+
     def build_lexicon(self, collection: Collection, inv_index: InvertedIndex):
         for term, postings in inv_index.items:
             self.__add_term_lexicon(collection.size, term, postings)
+        self.__remove_stop_terms()
+
+    def build_unigrams(self, collection: Collection):
+        vectorizer = TfidfVectorizer(
+            token_pattern=Lexicon.REGEX,
+            lowercase=False,
+            stop_words=self.__stop_terms,
+        )
+        tfidf_matrix = vectorizer.fit_transform([document.text for document in collection.documents])
+        features = vectorizer.get_feature_names_out()
+        sums = tfidf_matrix.sum(axis=0)
+        self.__unigrams = {term: sums[0, col] for col, term in enumerate(features)}
 
     def get_term_lexicon(self, term: str) -> TermLexicon:
         return self.__lexicon[term]

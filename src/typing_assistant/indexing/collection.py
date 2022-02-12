@@ -6,7 +6,7 @@ from typing import Dict, List
 
 class Document:
 
-    REGEX: str = r'\w+'
+    REGEX: str = r'[a-z]+'
 
     def __init__(self, text: str):
         self.__text: str = text
@@ -41,6 +41,10 @@ class Collection:
         self.__documents: Dict[int, Document] = {}
         self.__docs_id: List[int]
         self.__n_documents: int
+
+    @property
+    def documents(self) -> List[Document]:
+        return [*self.__documents.values()]
 
     @property
     def docs_id(self) -> List[int]:
