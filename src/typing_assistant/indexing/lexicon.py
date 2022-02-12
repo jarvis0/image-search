@@ -1,7 +1,7 @@
 import math
 import pickle
 from os.path import join
-from typing import Dict, List, Set
+from typing import Dict, List
 
 from . import Collection, InvertedIndex
 from .indexer import Posting
@@ -42,9 +42,6 @@ class Lexicon:
 
     def __init__(self, context: Context):
         self.__lexicon: Dict[str, TermLexicon] = {}
-        self.__en_stop_terms: Set[str] = context.en_stop_terms
-        self.__stop_terms_fraction: float = context.stop_terms_fraction
-        self.__stop_terms: Set[str]
 
     @property
     def terms(self) -> List[str]:
@@ -61,22 +58,9 @@ class Lexicon:
             postings,
         )
 
-    def __remove_stop_terms(self):
-        n_stop_terms = int(self.__stop_terms_fraction * len(self.__lexicon))
-        self.__stop_terms = {
-            x[0] for x in sorted(
-                self.__lexicon.items(),
-                key=lambda x: x[1].tot_freq,
-                reverse=True,
-            )[: n_stop_terms]
-        } & self.__en_stop_terms
-        for stop_term in self.__stop_terms:
-            del self.__lexicon[stop_term]
-
     def build_lexicon(self, collection: Collection, inv_index: InvertedIndex):
         for term, postings in inv_index.items:
             self.__add_term_lexicon(collection.size, term, postings)
-        self.__remove_stop_terms()
 
     def get_term_lexicon(self, term: str) -> TermLexicon:
         return self.__lexicon[term]

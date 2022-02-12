@@ -6,7 +6,6 @@
         "space": " ",
         "empty": ""
     },
-    "stop_terms_fraction": 1e-2,
     "max_completions": 10,
     "max_images": 3,
     "sequencediff_cutoff": 0.8,
