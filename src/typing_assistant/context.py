@@ -1,8 +1,10 @@
 import json
 from os.path import join
-from typing import Any, Dict
+from typing import Any, Dict, Set
 
 from blessings import Terminal
+
+import nltk
 
 
 class Context():
@@ -21,6 +23,11 @@ class Context():
     @property
     def term(self) -> Terminal:
         return self.__term
+
+    @property
+    def en_stop_terms(self) -> Set[str]:
+        nltk.download('stopwords', quiet=True)
+        return {*nltk.corpus.stopwords.words('english')}
 
     @property
     def stop_terms_fraction(self) -> float:
