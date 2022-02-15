@@ -1,7 +1,10 @@
 import math
 import pickle
+from itertools import chain
 from os.path import join
 from typing import Dict, List, Set
+
+from nltk import ConditionalFreqDist, bigrams
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 
@@ -49,6 +52,7 @@ class Lexicon:
         self.__stop_terms_fraction: float = context.stop_terms_fraction
         self.__stop_terms: Set[str]
         self.__unigrams: Dict[str, float]
+        self.__bigrams: Dict[str, int]
 
     @property
     def terms(self) -> List[str]:
@@ -92,10 +96,16 @@ class Lexicon:
             lowercase=False,
             stop_words=self.__stop_terms,
         )
-        tfidf_matrix = vectorizer.fit_transform([document.text for document in collection.documents])
+        tfidf_matrix = vectorizer.fit_transform(document.text for document in collection.documents)
         features = vectorizer.get_feature_names_out()
         sums = tfidf_matrix.sum(axis=0)
         self.__unigrams = {term: sums[0, col] for col, term in enumerate(features)}
+
+    def build_bigrams(self, collection: Collection):
+        bgs = [*chain(*([
+            *bigrams(filter(lambda x: x not in self.__stop_terms, document.tokens)),
+        ] for document in collection.documents))]
+        self.__bigrams = ConditionalFreqDist(list(bgs))
 
     def get_term_lexicon(self, term: str) -> TermLexicon:
         return self.__lexicon[term]

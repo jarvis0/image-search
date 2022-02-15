@@ -3,7 +3,7 @@ import time
 from .config import config
 from .context import Context
 from .indexing.indexes_loader import load_indexes
-from .ranking import OkapiBM25Ranker
+from .suggestions import OkapiBM25Ranker
 
 
 if __name__ == '__main__':

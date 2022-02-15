@@ -8,7 +8,7 @@ from .config import config
 from .context import Context
 from .indexing.images_handler import ImagesHandler
 from .indexing.indexes_loader import load_indexes
-from .ranking import OkapiBM25Ranker
+from .suggestions import OkapiBM25Ranker
 
 
 class CLIApp():

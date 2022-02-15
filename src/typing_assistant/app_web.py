@@ -5,7 +5,7 @@ from flask import Flask, escape, render_template, request
 from .config import config
 from .context import Context
 from .indexing.indexes_loader import load_indexes
-from .ranking import OkapiBM25Ranker
+from .suggestions import OkapiBM25Ranker
 
 
 def create_web_app():
