@@ -4,7 +4,7 @@ from io import BytesIO
 from os.path import join
 from typing import Dict, List, Optional, Tuple
 
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 
 import aiohttp
 
@@ -34,11 +34,14 @@ class ImagesHandler:
     @staticmethod
     async def __draw_image(image: Optional[bytes], caption: str):
         if image is not None:
-            img = Image.open(BytesIO(image))
-            plt.figure()
-            plt.title(caption, wrap=True)
-            plt.imshow(img)
-            plt.show()
+            try:
+                img = Image.open(BytesIO(image))
+                plt.figure()
+                plt.title(caption, wrap=True)
+                plt.imshow(img)
+                plt.show()
+            except UnidentifiedImageError as e:
+                print(f'Unidentified image: {e}')
 
     @staticmethod
     async def __draw_images(images_captions: List[Tuple[Optional[bytes], str]]):
