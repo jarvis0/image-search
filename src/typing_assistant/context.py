@@ -17,6 +17,10 @@ class Context():
         self.__term: Terminal = Terminal()
 
     @property
+    def regex(self) -> str:
+        return self.__configs['regex']
+
+    @property
     def special_characters(self) -> Dict[str, str]:
         return self.__configs['special_characters']
 

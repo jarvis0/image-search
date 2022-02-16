@@ -6,13 +6,12 @@ from ..indexing import Lexicon
 
 class TypingAssistant():
 
-    REGEX: str = r'[a-z]+'
-
     def __init__(self, context: Context, lexicon: Lexicon):
-        self.__lexicon = lexicon
+        self.__regex: str = context.regex
+        self.__lexicon: Lexicon = lexicon
 
     def predict(self, query: str) -> dict:
-        query_terms = [*re.findall(TypingAssistant.REGEX, query.lower())]
+        query_terms = [*re.findall(self.__regex, query.lower())]
         if len(query_terms) >= 2:
             predictions = self.__lexicon.predict_from_trigram(query_terms[-2], query_terms[-1])
         else:

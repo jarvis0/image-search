@@ -1,4 +1,5 @@
 {
+    "regex": "[a-z]+",
     "special_characters": {
         "escape": "\n",
         "backspace": "\u007f",

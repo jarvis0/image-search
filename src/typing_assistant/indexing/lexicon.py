@@ -44,12 +44,12 @@ class TermLexicon:
 class Lexicon:
 
     DUMP_PATH: str = 'binaries/lexicon.pkl'
-    REGEX: str = r'[a-z]+'
 
     def __init__(self, context: Context):
-        self.__lexicon: Dict[str, TermLexicon] = {}
+        self.__regex: str = context.regex
         self.__en_stop_terms: Set[str] = context.en_stop_terms
         self.__stop_terms_fraction: float = context.stop_terms_fraction
+        self.__lexicon: Dict[str, TermLexicon] = {}
         self.__stop_terms: Set[str]
         self.__unigrams: ConditionalFreqDist
         self.__bigrams: ConditionalFreqDist
@@ -93,7 +93,7 @@ class Lexicon:
 
     def build_unigrams(self, collection: Collection):
         vectorizer = TfidfVectorizer(
-            token_pattern=Lexicon.REGEX,
+            token_pattern=self.__regex,
             lowercase=False,
             stop_words=self.__stop_terms,
         )
