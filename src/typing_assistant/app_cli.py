@@ -9,6 +9,7 @@ from .context import Context
 from .indexing.images_handler import ImagesHandler
 from .indexing.indexes_loader import load_indexes
 from .suggestions import OkapiBM25Ranker
+from .suggestions import TypingAssistant
 
 
 class CLIApp():
@@ -53,6 +54,7 @@ class CLIApp():
         self.__special_characters: Dict[str, Any] = ctx.special_characters
         collection, lexicon, images_handler = load_indexes(config.ROOT)
         self.__ranker: OkapiBM25Ranker = OkapiBM25Ranker(context, collection, lexicon)
+        self.__assistant: TypingAssistant = TypingAssistant(context, lexicon)
         self.__images_handler: ImagesHandler = images_handler
 
     def __is_allowed(self, char: str) -> bool:
@@ -92,10 +94,10 @@ class CLIApp():
     def __compute_suggestions(self, query: str) -> Dict[str, Any]:
         suggestions = CLIApp.init_suggestions()
         suggestions['query_completion'] = self.__ranker.lookup_query(query)
-        # if self.__is_space(query[-1]):
-        #     suggestions['word_correction'] = self.__assistant.correct(words)
-        #     if not bool(suggestions['word_correction']):
-        #         suggestions['word_prediction'] = self.__assistant.predict(words)
+        if self.__is_space(query[-1]):
+            # suggestions['word_correction'] = self.__assistant.correct(words)
+            if not bool(suggestions['word_correction']):
+                suggestions['word_prediction'] = self.__assistant.predict(query)
         # else:
         #     suggestions['word_completion'] = self.__assistant.complete(words)
         return suggestions
@@ -109,15 +111,15 @@ class CLIApp():
                 print(self.__special_characters['tab'] + query_completion)
             print(self.__term.normal)
         if bool(suggestions['word_correction']):
-            prefix = self.__term.move(1, query_length - len(words[-1]) + 8) + self.__term.green
+            prefix = self.__term.move(1, query_length - len(words[-1]) + 9) + self.__term.green
             suffix = self.__term.normal
             print(prefix + str(suggestions['word_correction']['right_word']) + suffix)
         elif bool(suggestions['word_prediction']):
-            prefix = self.__term.move(0, query_length + 8 + 1) + self.__term.dim
+            prefix = self.__term.move(0, query_length + 9 + 1) + self.__term.dim
             suffix = self.__term.normal + '"'
             print(prefix + suggestions['word_prediction']['next_word'] + suffix)
         elif bool(suggestions['word_completion']):
-            prefix = self.__term.move(1, query_length - len(words[-1]) + 8) + self.__term.dim
+            prefix = self.__term.move(1, query_length - len(words[-1]) + 9) + self.__term.dim
             suffix = self.__term.normal
             print(prefix + suggestions['word_completion']['complete_word'] + suffix)
 

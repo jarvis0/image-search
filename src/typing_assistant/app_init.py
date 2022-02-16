@@ -25,6 +25,7 @@ if __name__ == '__main__':
     lexicon.build_lexicon(collection, inv_index)
     lexicon.build_unigrams(collection)
     lexicon.build_bigrams(collection)
+    lexicon.build_trigrams(collection)
     print('build lexicon', time.time() - tic)
     tic = time.time()
     images_url = df['url'].to_dict()

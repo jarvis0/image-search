@@ -4,7 +4,7 @@ from itertools import chain
 from os.path import join
 from typing import Dict, List, Set
 
-from nltk import ConditionalFreqDist, bigrams
+from nltk import ConditionalFreqDist, bigrams, trigrams
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 
@@ -51,8 +51,9 @@ class Lexicon:
         self.__en_stop_terms: Set[str] = context.en_stop_terms
         self.__stop_terms_fraction: float = context.stop_terms_fraction
         self.__stop_terms: Set[str]
-        self.__unigrams: Dict[str, float]
-        self.__bigrams: Dict[str, int]
+        self.__unigrams: ConditionalFreqDist
+        self.__bigrams: ConditionalFreqDist
+        self.__trigrams: ConditionalFreqDist
 
     @property
     def terms(self) -> List[str]:
@@ -102,10 +103,28 @@ class Lexicon:
         self.__unigrams = {term: sums[0, col] for col, term in enumerate(features)}
 
     def build_bigrams(self, collection: Collection):
-        bgs = [*chain(*([
-            *bigrams(filter(lambda x: x not in self.__stop_terms, document.tokens)),
-        ] for document in collection.documents))]
-        self.__bigrams = ConditionalFreqDist(list(bgs))
+        bgs = chain(
+            *([
+                *bigrams(filter(lambda x: x not in self.__stop_terms, document.tokens)),
+            ] for document in collection.documents),
+        )
+        self.__bigrams = ConditionalFreqDist(bgs)
+
+    def build_trigrams(self, collection: Collection):
+        full_tgs = chain(
+            *([
+                *trigrams(filter(lambda x: x not in self.__stop_terms, document.tokens)),
+            ] for document in collection.documents),
+        )
+        a, b, c = zip(*full_tgs)
+        tgs = [*zip(zip(a, b), c)]
+        self.__trigrams = ConditionalFreqDist(tgs)
+
+    def predict_from_bigram(self, term: str) -> List[Dict[str, int]]:
+        return list(self.__bigrams[term])
+
+    def predict_from_trigram(self, term_a: str, term_b: str) -> List[Dict[str, int]]:
+        return list(self.__trigrams[term_a, term_b])
 
     def get_term_lexicon(self, term: str) -> TermLexicon:
         return self.__lexicon[term]
