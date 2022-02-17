@@ -18,33 +18,33 @@ class CLIApp():
         return getch.getch()
 
     @staticmethod
-    def init_suggestions() -> dict:
+    def init_suggestions() -> Dict[str, Any]:
         return {
             'query_completion': {},
-            'word_correction': {},
-            'word_prediction': {},
-            'word_completion': {},
+            'term_correction': {},
+            'term_prediction': {},
+            'term_completion': {},
         }
 
     @staticmethod
-    def replace_from_right(query: str, old_word: str, new_word: str) -> str:
-        return new_word.join(query.rsplit(old_word, 1))
+    def replace_from_right(query: str, old_term: str, new_term: str) -> str:
+        return new_term.join(query.rsplit(old_term, 1))
 
     @staticmethod
     def apply_suggestion(query: str, suggestions: Dict[str, Any]) -> str:
-        if bool(suggestions['word_correction']):
+        if bool(suggestions['term_correction']):
             query = CLIApp.replace_from_right(
                 query,
-                suggestions['word_correction']['wrong_word'],
-                suggestions['word_correction']['right_word'],
+                suggestions['term_correction']['wrong_term'],
+                suggestions['term_correction']['right_term'],
             )
-        elif bool(suggestions['word_prediction']):
-            query += suggestions['word_prediction']['next_word']
-        elif bool(suggestions['word_completion']):
+        elif bool(suggestions['term_prediction']):
+            query += suggestions['term_prediction']['next_term']
+        elif bool(suggestions['term_completion']):
             query = CLIApp.replace_from_right(
                 query,
-                suggestions['word_completion']['incomplete_word'],
-                suggestions['word_completion']['complete_word'],
+                suggestions['term_completion']['incomplete_term'],
+                suggestions['term_completion']['complete_term'],
             )
         return query
 
@@ -94,33 +94,33 @@ class CLIApp():
         suggestions = CLIApp.init_suggestions()
         suggestions['query_completion'] = self.__ranker.lookup_query(query)
         if self.__is_space(query[-1]):
-            # suggestions['word_correction'] = self.__assistant.correct(words)
-            if not bool(suggestions['word_correction']):
-                suggestions['word_prediction'] = self.__assistant.predict(query)
+            # suggestions['term_correction'] = self.__assistant.correct(terms)
+            if not bool(suggestions['term_correction']):
+                suggestions['term_prediction'] = self.__assistant.predict(query)[0]
         # else:
-        #     suggestions['word_completion'] = self.__assistant.complete(words)
+        #     suggestions['term_completion'] = self.__assistant.complete(terms)
         return suggestions
 
     def __print_suggestions(self, query: str, suggestions: dict):
         query_length = len(query)
-        words = ''
+        terms = ''
         if bool(suggestions['query_completion']):
             print(self.__term.move(1, 0) + self.__term.cyan)
             for _, query_completion, _ in suggestions['query_completion']:
                 print(self.__special_characters['tab'] + query_completion)
             print(self.__term.normal)
-        if bool(suggestions['word_correction']):
-            prefix = self.__term.move(1, query_length - len(words[-1]) + 9) + self.__term.green
+        if bool(suggestions['term_correction']):
+            prefix = self.__term.move(1, query_length - len(terms[-1]) + 9) + self.__term.green
             suffix = self.__term.normal
-            print(prefix + str(suggestions['word_correction']['right_word']) + suffix)
-        elif bool(suggestions['word_prediction']):
+            print(prefix + str(suggestions['term_correction']['right_term']) + suffix)
+        elif bool(suggestions['term_prediction']):
             prefix = self.__term.move(0, query_length + 9 + 1) + self.__term.dim
             suffix = self.__term.normal + '"'
-            print(prefix + suggestions['word_prediction']['next_word'] + suffix)
-        elif bool(suggestions['word_completion']):
-            prefix = self.__term.move(1, query_length - len(words[-1]) + 9) + self.__term.dim
+            print(prefix + suggestions['term_prediction']['next_term'] + suffix)
+        elif bool(suggestions['term_completion']):
+            prefix = self.__term.move(1, query_length - len(terms[-1]) + 9) + self.__term.dim
             suffix = self.__term.normal
-            print(prefix + suggestions['word_completion']['complete_word'] + suffix)
+            print(prefix + suggestions['term_completion']['complete_term'] + suffix)
 
     def __show_images(self, query_completions: List):
         images = self.__images_handler.download_images([doc_id for doc_id, _, _ in query_completions])

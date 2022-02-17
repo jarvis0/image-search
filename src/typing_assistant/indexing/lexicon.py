@@ -120,11 +120,11 @@ class Lexicon:
         tgs = [*zip(zip(a, b), c)]
         self.__trigrams = ConditionalFreqDist(tgs)
 
-    def predict_from_bigram(self, term: str) -> List[Dict[str, int]]:
-        return list(self.__bigrams[term])
+    def predict_from_bigram(self, term: str) -> Dict[str, int]:
+        return dict(self.__bigrams[term])
 
-    def predict_from_trigram(self, term_a: str, term_b: str) -> List[Dict[str, int]]:
-        return list(self.__trigrams[term_a, term_b])
+    def predict_from_trigram(self, term_a: str, term_b: str) -> Dict[str, int]:
+        return dict(self.__trigrams[term_a, term_b])
 
     def get_term_lexicon(self, term: str) -> TermLexicon:
         return self.__lexicon[term]

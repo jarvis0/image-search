@@ -12,5 +12,6 @@
     "max_images": 3,
     "sequencediff_cutoff": 0.8,
     "semantic_cutoff": 0.7,
-    "n_semantic_neighbors": 1
+    "n_semantic_neighbors": 1,
+    "max_predictions": 1
 }

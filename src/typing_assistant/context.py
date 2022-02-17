@@ -56,3 +56,7 @@ class Context():
     @property
     def n_semantic_neighbors(self) -> int:
         return self.__configs['n_semantic_neighbors']
+
+    @property
+    def max_predictions(self) -> int:
+        return self.__configs['max_predictions']

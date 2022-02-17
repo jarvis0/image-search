@@ -1,4 +1,5 @@
 import re
+from typing import Dict, List
 
 from ..context import Context
 from ..indexing import Lexicon
@@ -8,18 +9,22 @@ class TypingAssistant():
 
     def __init__(self, context: Context, lexicon: Lexicon):
         self.__regex: str = context.regex
+        self.__max_predictions: int = context.max_predictions
         self.__lexicon: Lexicon = lexicon
 
-    def predict(self, query: str) -> dict:
+    def predict(self, query: str) -> List[Dict]:
         query_terms = [*re.findall(self.__regex, query.lower())]
+        predictions = {}
         if len(query_terms) >= 2:
             predictions = self.__lexicon.predict_from_trigram(query_terms[-2], query_terms[-1])
-        else:
+        if len(predictions) == 0:
             predictions = self.__lexicon.predict_from_bigram(query_terms[-1])
-        suggestion = {}
+        suggestions: List[Dict] = [{}]
         if len(predictions) >= 1:
-            suggestion = {'next_word': predictions[0]}
-        return suggestion
+            sorted_predictions = sorted(predictions.items(), key=lambda x: x[1], reverse=True)
+            term_predictions = [term for term, _ in sorted_predictions[: self.__max_predictions]]
+            suggestions = [{'next_term': term} for term in term_predictions][: self.__max_predictions]
+        return suggestions
 
     # def correct(self, input_words: tuple) -> dict:
     #    known_word = []
