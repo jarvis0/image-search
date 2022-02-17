@@ -11,9 +11,9 @@ class OkapiBM25Ranker:
 
     KAPPA: float = 1.5
     BETA: float = 0.75
-    REGEX: str = r'\w+'
 
     def __init__(self, context: Context, collection: Collection, lexicon: Lexicon):
+        self.__regex: str = context.regex
         self.__max_completions: int = context.max_completions
         self.__collection: Collection = collection
         self.__lexicon: Lexicon = lexicon
@@ -21,19 +21,19 @@ class OkapiBM25Ranker:
         self.__avgdl: float = sum(x.tot_freq for x in self.__lexicon.terms_lexicon) / self.__collection.size
 
     def lookup_query(self, query: str) -> List[Tuple[int, str, float]]:
-        query_words = [*re.findall(OkapiBM25Ranker.REGEX, query)]
-        seq_expanded_query_words = self.__query_expander.expand_by_sequence(query_words)
-        sem_expanded_query_words = self.__query_expander.expand_by_semantics(query_words)
-        expanded_query_words = {**seq_expanded_query_words, **sem_expanded_query_words}
+        query_terms = [*re.findall(self.__regex, query.lower())]
+        seq_expanded_query_terms = self.__query_expander.expand_by_sequence(query_terms)
+        sem_expanded_query_terms = self.__query_expander.expand_by_semantics(query_terms)
+        expanded_query_terms = {**seq_expanded_query_terms, **sem_expanded_query_terms}
         tf: DefaultDict[str, DefaultDict[int, int]] = defaultdict(lambda: defaultdict(int))
         idf = {}
-        for w in expanded_query_words:
-            word_lexicon = self.__lexicon.get_word_lexicon(w)
-            idf[w] = word_lexicon.idf
-            for p in word_lexicon.postings:
+        for w in expanded_query_terms:
+            term_lexicon = self.__lexicon.get_term_lexicon(w)
+            idf[w] = term_lexicon.idf
+            for p in term_lexicon.postings:
                 tf[w][p.doc_id] += p.frequency
         scores: DefaultDict[int, float] = defaultdict(int)
-        for w, weight in expanded_query_words.items():
+        for w, weight in expanded_query_terms.items():
             for doc_id in tf[w]:
                 scores[doc_id] += weight * idf[w] * ((OkapiBM25Ranker.KAPPA + 1) * tf[w][doc_id] / (
                     tf[w][doc_id] + OkapiBM25Ranker.KAPPA * (

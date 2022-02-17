@@ -4,7 +4,7 @@ from io import BytesIO
 from os.path import join
 from typing import Dict, List, Optional, Tuple
 
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 
 import aiohttp
 
@@ -17,10 +17,6 @@ class ImagesHandler:
 
     DUMP_PATH: str = 'binaries/images_handler.pkl'
 
-    def __init__(self, context: Context):
-        self.__max_images = context.max_images
-        self.__images_url: Dict[int, str]
-
     @staticmethod
     async def get_image(session: aiohttp.ClientSession, url: str) -> Optional[bytes]:
         try:
@@ -31,21 +27,29 @@ class ImagesHandler:
             return None
 
     @staticmethod
-    async def get_images(urls: List[str]) -> List[bytes]:
+    async def get_images(urls: List[str]) -> List[Optional[bytes]]:
         async with aiohttp.ClientSession() as session:
             return await asyncio.gather(*[ImagesHandler.get_image(session, url) for url in urls])
 
     @staticmethod
-    async def __draw_image(image: bytes, caption: str):
-        img = Image.open(BytesIO(image))
-        plt.figure()
-        plt.title(caption, wrap=True)
-        plt.imshow(img)
-        plt.show()
+    async def __draw_image(image: Optional[bytes], caption: str):
+        if image is not None:
+            try:
+                img = Image.open(BytesIO(image))
+                plt.figure()
+                plt.title(caption, wrap=True)
+                plt.imshow(img)
+                plt.show()
+            except UnidentifiedImageError as e:
+                print(f'Unidentified image: {e}')
 
     @staticmethod
-    async def __draw_images(images_captions: List[Tuple[bytes, str]]):
+    async def __draw_images(images_captions: List[Tuple[Optional[bytes], str]]):
         await asyncio.gather(*[ImagesHandler.__draw_image(image, caption) for image, caption in images_captions])
+
+    def __init__(self, context: Context):
+        self.__max_images = context.max_images
+        self.__images_url: Dict[int, str]
 
     @property
     def images_url(self) -> Dict[int, str]:
@@ -58,11 +62,11 @@ class ImagesHandler:
     def get_url(self, doc_id: int) -> str:
         return self.images_url[doc_id]
 
-    def download_images(self, doc_ids: List[int]) -> List[bytes]:
+    def download_images(self, doc_ids: List[int]) -> List[Optional[bytes]]:
         urls = [self.images_url[doc_id] for doc_id in doc_ids][: self.__max_images]
         return asyncio.run(ImagesHandler.get_images(urls))
 
-    def draw_images(self, images_captions: List[Tuple[bytes, str]]):
+    def draw_images(self, images_captions: List[Tuple[Optional[bytes], str]]):
         asyncio.run(ImagesHandler.__draw_images(images_captions))
 
     def dump(self, root: str):

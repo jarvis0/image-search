@@ -3,12 +3,13 @@ import re
 from os.path import join
 from typing import Dict, List
 
+from ..context import Context
+
 
 class Document:
 
-    REGEX: str = r'\w+'
-
-    def __init__(self, text: str):
+    def __init__(self, regex: str, text: str):
+        self.__regex: str = regex
         self.__text: str = text
         self.__tokens: List[str]
         self.__length: int
@@ -29,7 +30,7 @@ class Document:
         return self.__length
 
     def tokenize_text(self):
-        self.__tokens = tuple(re.findall(Document.REGEX, self.__text))
+        self.__tokens = tuple(re.findall(self.__regex, self.__text))
         self.__length = len(self.__tokens)
 
 
@@ -37,10 +38,15 @@ class Collection:
 
     DUMP_PATH: str = 'binaries/collection.pkl'
 
-    def __init__(self):
+    def __init__(self, context: Context):
+        self.__regex: str = context.regex
         self.__documents: Dict[int, Document] = {}
         self.__docs_id: List[int]
         self.__n_documents: int
+
+    @property
+    def documents(self) -> List[Document]:
+        return [*self.__documents.values()]
 
     @property
     def docs_id(self) -> List[int]:
@@ -51,7 +57,7 @@ class Collection:
         return self.__n_documents
 
     def __add_document(self, doc_id: int, text: str):
-        document = Document(text)
+        document = Document(self.__regex, text)
         document.tokenize_text()
         self.__documents[doc_id] = document
 

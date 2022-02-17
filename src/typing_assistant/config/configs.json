@@ -1,4 +1,5 @@
 {
+    "regex": "[a-z]+",
     "special_characters": {
         "escape": "\n",
         "backspace": "\u007f",
@@ -6,12 +7,11 @@
         "space": " ",
         "empty": ""
     },
+    "stop_terms_fraction": 1e-2,
     "max_completions": 10,
     "max_images": 3,
     "sequencediff_cutoff": 0.8,
     "semantic_cutoff": 0.7,
     "n_semantic_neighbors": 1,
-    "word_correction_predictions": 1,
-    "word_prediction_predictions": 1,
-    "word_completion_predictions": 1
+    "max_predictions": 1
 }

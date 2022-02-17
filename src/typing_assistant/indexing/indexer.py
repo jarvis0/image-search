@@ -27,15 +27,15 @@ class Posting:
 
 class InvertedIndex:
 
-    def __init__(self, collection: Collection):
-        self.__collection: Collection = collection
-        self.__inv_index: DefaultDict[str, List[Posting]] = defaultdict(list)
-
     @staticmethod
     def __index_document(doc_id: int, document: Document):
         term_frequencies: Dict[str, int] = Counter(document.tokens)
         partial_term_postings = [(term, [Posting(doc_id, freq)]) for term, freq in term_frequencies.items()]
         return partial_term_postings
+
+    def __init__(self, collection: Collection):
+        self.__collection: Collection = collection
+        self.__inv_index: DefaultDict[str, List[Posting]] = defaultdict(list)
 
     @property
     def items(self) -> List[Tuple[str, List[Posting]]]:
