@@ -60,3 +60,7 @@ class Context():
     @property
     def max_predictions(self) -> int:
         return self.__configs['max_predictions']
+
+    @property
+    def max_corrections(self) -> int:
+        return self.__configs['max_corrections']

@@ -1,4 +1,3 @@
-import re
 from collections import defaultdict
 from typing import DefaultDict, List, Tuple
 
@@ -13,15 +12,13 @@ class OkapiBM25Ranker:
     BETA: float = 0.75
 
     def __init__(self, context: Context, collection: Collection, lexicon: Lexicon):
-        self.__regex: str = context.regex
         self.__max_completions: int = context.max_completions
         self.__collection: Collection = collection
         self.__lexicon: Lexicon = lexicon
         self.__query_expander: QueryExpander = QueryExpander(context, lexicon)
         self.__avgdl: float = sum(x.tot_freq for x in self.__lexicon.terms_lexicon) / self.__collection.size
 
-    def lookup_query(self, query: str) -> List[Tuple[int, str, float]]:
-        query_terms = [*re.findall(self.__regex, query.lower())]
+    def lookup_query(self, query_terms: List[str]) -> List[Tuple[int, str, float]]:
         seq_expanded_query_terms = self.__query_expander.expand_by_sequence(query_terms)
         sem_expanded_query_terms = self.__query_expander.expand_by_semantics(query_terms)
         expanded_query_terms = {**seq_expanded_query_terms, **sem_expanded_query_terms}
