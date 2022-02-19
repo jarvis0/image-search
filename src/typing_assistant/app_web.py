@@ -32,16 +32,22 @@ def create_web_app():
     @web_app.route('/query_partially', methods=['POST'])
     def query_partially():
         partial_query = str(escape(request.form.get('partial_query')))
-        query_results = ranker.lookup_query(partial_query)
-        query_results = [text for _, text, _ in query_results]
-        response = {'partial_query_results': query_results}
+        query_terms = partial_query.lower().split()
+        query_completions = ranker.lookup_query(query_terms)
+        captions = [query_completion['document'] for query_completion in query_completions]
+        response = {'partial_query_results': captions}
         return response
 
     @web_app.route('/query', methods=['POST'])
     def query():
         query = str(escape(request.form.get('query', '')))
-        query_results = ranker.lookup_query(query)
-        query_results = [(images_handler.get_url(doc_id), text, round(score, 4)) for doc_id, text, score in query_results]
+        query_terms = query.lower().split()
+        query_completions = ranker.lookup_query(query_terms)
+        query_results = [(
+            images_handler.get_url(query_completion['doc_id']),
+            query_completion['document'],
+            round(query_completion['score'], 4),
+        ) for query_completion in query_completions]
         return render_template('query.html', query=query, query_results=query_results)
 
     return web_app

@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List
 
 from blessings import Terminal
 
@@ -20,7 +20,7 @@ class CLIApp():
     @staticmethod
     def init_suggestions() -> Dict[str, Any]:
         return {
-            'query_completion': {},
+            'query_completions': {},
             'term_correction': {},
             'term_prediction': {},
             'term_completion': {},
@@ -93,7 +93,7 @@ class CLIApp():
     def __compute_suggestions(self, query: str) -> Dict[str, Any]:
         query_terms = query.lower().split()
         suggestions = CLIApp.init_suggestions()
-        suggestions['query_completion'] = self.__ranker.lookup_query(query_terms)
+        suggestions['query_completions'] = self.__ranker.lookup_query(query_terms)
         if self.__is_space(query[-1]):
             suggestions['term_correction'] = self.__assistant.correct(query_terms)[0]
             if not bool(suggestions['term_correction']):
@@ -105,10 +105,10 @@ class CLIApp():
     def __print_suggestions(self, query: str, suggestions: Dict[str, Any]):
         query_length = len(query)
         last_term = query.split()[-1]
-        if bool(suggestions['query_completion']):
+        if bool(suggestions['query_completions']):
             print(self.__term.move(1, 0) + self.__term.cyan)
-            for _, query_completion, _ in suggestions['query_completion']:
-                print(self.__special_characters['tab'] + query_completion)
+            for query_completion in suggestions['query_completions']:
+                print(self.__special_characters['tab'] + query_completion['document'])
             print(self.__term.normal)
         if bool(suggestions['term_correction']):
             prefix = self.__term.move(1, query_length - len(last_term) + 9) + self.__term.green
@@ -123,9 +123,9 @@ class CLIApp():
             suffix = self.__term.normal
             print(prefix + suggestions['term_completion']['complete_term'] + suffix)
 
-    def __show_images(self, query_completions: List[Tuple[int, str, float]]):
-        images = self.__images_handler.download_images([doc_id for doc_id, _, _ in query_completions])
-        captions = [caption for _, caption, _ in query_completions]
+    def __show_images(self, query_completions: List[Dict[str, Any]]):
+        images = self.__images_handler.download_images([query_completion['doc_id'] for query_completion in query_completions])
+        captions = [query_completion['document'] for query_completion in query_completions]
         images_captions = [*zip(images, captions)]
         self.__images_handler.draw_images(images_captions)
 
