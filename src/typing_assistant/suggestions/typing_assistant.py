@@ -29,8 +29,9 @@ class TypingAssistant():
         return suggestions
 
     def correct(self, query_terms: List[str]) -> List[Dict[str, str]]:
+        known_term = {query_terms[-1]} & {*self.__terms}
         sequence_similar_terms = self.__sequence_similarity.retrieve_similar_terms([query_terms[-1]], self.__terms)
-        candidates = {*sequence_similar_terms}
+        candidates = known_term or {*sequence_similar_terms}
 
         corrections = []
         if len(query_terms) >= 3:
