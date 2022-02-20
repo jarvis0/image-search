@@ -57,7 +57,7 @@ class Lexicon:
 
     @property
     def terms(self) -> List[str]:
-        return [*self.__lexicon.keys()]
+        return [*self.__lexicon]
 
     @property
     def terms_lexicon(self) -> List[TermLexicon]:

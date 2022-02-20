@@ -62,9 +62,13 @@ class Context():
         return self.__configs['max_semantic_similarities']
 
     @property
-    def max_predictions(self) -> int:
-        return self.__configs['max_predictions']
+    def max_term_predictions(self) -> int:
+        return self.__configs['max_term_predictions']
 
     @property
-    def max_corrections(self) -> int:
-        return self.__configs['max_corrections']
+    def max_term_corrections(self) -> int:
+        return self.__configs['max_term_corrections']
+
+    @property
+    def max_term_completions(self) -> int:
+        return self.__configs['max_term_completions']
