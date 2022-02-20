@@ -20,7 +20,7 @@ class CLIApp():
     @staticmethod
     def init_suggestions() -> Dict[str, Any]:
         return {
-            'query_completion': {},
+            'query_completions': {},
             'term_correction': {},
             'term_prediction': {},
             'term_completion': {},
@@ -36,7 +36,7 @@ class CLIApp():
             query = CLIApp.replace_from_right(
                 query,
                 suggestions['term_correction']['wrong_term'],
-                suggestions['term_correction']['right_term'],
+                suggestions['term_correction']['correct_term'],
             )
         elif bool(suggestions['term_prediction']):
             query += suggestions['term_prediction']['next_term']
@@ -91,40 +91,41 @@ class CLIApp():
         print(self.__term.clear() + self.__term.move(0, 0) + f'Caption: "{query}"')
 
     def __compute_suggestions(self, query: str) -> Dict[str, Any]:
+        query_terms = query.lower().split()
         suggestions = CLIApp.init_suggestions()
-        suggestions['query_completion'] = self.__ranker.lookup_query(query)
+        suggestions['query_completions'] = self.__ranker.lookup_query(query_terms)
         if self.__is_space(query[-1]):
-            # suggestions['term_correction'] = self.__assistant.correct(terms)
+            suggestions['term_correction'] = self.__assistant.correct(query_terms)[0]
             if not bool(suggestions['term_correction']):
-                suggestions['term_prediction'] = self.__assistant.predict(query)[0]
+                suggestions['term_prediction'] = self.__assistant.predict(query_terms)[0]
         # else:
         #     suggestions['term_completion'] = self.__assistant.complete(terms)
         return suggestions
 
-    def __print_suggestions(self, query: str, suggestions: dict):
+    def __print_suggestions(self, query: str, suggestions: Dict[str, Any]):
         query_length = len(query)
-        terms = ''
-        if bool(suggestions['query_completion']):
+        last_term = query.split()[-1]
+        if bool(suggestions['query_completions']):
             print(self.__term.move(1, 0) + self.__term.cyan)
-            for _, query_completion, _ in suggestions['query_completion']:
-                print(self.__special_characters['tab'] + query_completion)
+            for query_completion in suggestions['query_completions']:
+                print(self.__special_characters['tab'] + query_completion['document'])
             print(self.__term.normal)
         if bool(suggestions['term_correction']):
-            prefix = self.__term.move(1, query_length - len(terms[-1]) + 9) + self.__term.green
+            prefix = self.__term.move(1, query_length - len(last_term) + 9) + self.__term.green
             suffix = self.__term.normal
-            print(prefix + str(suggestions['term_correction']['right_term']) + suffix)
+            print(prefix + str(suggestions['term_correction']['correct_term']) + suffix)
         elif bool(suggestions['term_prediction']):
             prefix = self.__term.move(0, query_length + 9 + 1) + self.__term.dim
             suffix = self.__term.normal + '"'
             print(prefix + suggestions['term_prediction']['next_term'] + suffix)
         elif bool(suggestions['term_completion']):
-            prefix = self.__term.move(1, query_length - len(terms[-1]) + 9) + self.__term.dim
+            prefix = self.__term.move(1, query_length - len(last_term) + 9) + self.__term.dim
             suffix = self.__term.normal
             print(prefix + suggestions['term_completion']['complete_term'] + suffix)
 
-    def __show_images(self, query_completions: List):
-        images = self.__images_handler.download_images([doc_id for doc_id, _, _ in query_completions])
-        captions = [caption for _, caption, _ in query_completions]
+    def __show_images(self, query_completions: List[Dict[str, Any]]):
+        images = self.__images_handler.download_images([query_completion['doc_id'] for query_completion in query_completions])
+        captions = [query_completion['document'] for query_completion in query_completions]
         images_captions = [*zip(images, captions)]
         self.__images_handler.draw_images(images_captions)
 

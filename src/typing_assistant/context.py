@@ -46,17 +46,25 @@ class Context():
         return self.__configs['max_images']
 
     @property
-    def sequencediff_cutoff(self) -> float:
-        return self.__configs['sequencediff_cutoff']
+    def sequence_similarity_cutoff(self) -> float:
+        return self.__configs['sequence_similarity_cutoff']
 
     @property
-    def semantic_cutoff(self) -> float:
-        return self.__configs['semantic_cutoff']
+    def max_sequence_similarities(self) -> int:
+        return self.__configs['max_sequence_similarities']
 
     @property
-    def n_semantic_neighbors(self) -> int:
-        return self.__configs['n_semantic_neighbors']
+    def semantic_similarity_cutoff(self) -> float:
+        return self.__configs['semantic_similarity_cutoff']
+
+    @property
+    def max_semantic_similarities(self) -> int:
+        return self.__configs['max_semantic_similarities']
 
     @property
     def max_predictions(self) -> int:
         return self.__configs['max_predictions']
+
+    @property
+    def max_corrections(self) -> int:
+        return self.__configs['max_corrections']

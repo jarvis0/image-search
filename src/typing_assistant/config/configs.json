@@ -10,8 +10,10 @@
     "stop_terms_fraction": 1e-2,
     "max_completions": 10,
     "max_images": 3,
-    "sequencediff_cutoff": 0.8,
-    "semantic_cutoff": 0.7,
-    "n_semantic_neighbors": 1,
-    "max_predictions": 1
+    "sequence_similarity_cutoff": 0.8,
+    "max_sequence_similarities": 3,
+    "semantic_similarity_cutoff": 0.7,
+    "max_semantic_similarities": 1,
+    "max_predictions": 1,
+    "max_corrections": 1
 }
