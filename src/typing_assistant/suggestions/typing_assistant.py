@@ -30,9 +30,9 @@ class TypingAssistant():
         return suggestions
 
     def correct(self, query_terms: List[str]) -> List[Dict[str, str]]:
-        known_term = {query_terms[-1]} & {*self.__terms}
-        sequence_similar_terms = self.__sequence_similarity.retrieve_similar_terms([query_terms[-1]], self.__terms)
-        candidates = known_term or {*sequence_similar_terms}
+        candidates = {query_terms[-1]} & {*self.__terms}
+        if len(candidates) == 0:
+            candidates = {*self.__sequence_similarity.retrieve_similar_terms([query_terms[-1]], self.__terms)}
 
         corrections = []
         if len(query_terms) >= 3:
@@ -63,10 +63,10 @@ class TypingAssistant():
         return suggestions
 
     def complete(self, query_terms: List[str]) -> List[Dict[str, str]]:
-        known_term = {query_terms[-1]} & {*self.__terms}
-        term_cutoff = len(query_terms[-1]) + 1
-        sequence_similar_terms = self.__sequence_similarity.retrieve_similar_terms([query_terms[-1]], self.__terms, term_cutoff)
-        candidates = known_term or {*sequence_similar_terms}
+        candidates = {query_terms[-1]} & {*self.__terms}
+        if len(candidates) == 0:
+            term_cutoff = len(query_terms[-1]) + 1
+            candidates = {*self.__sequence_similarity.retrieve_similar_terms([query_terms[-1]], self.__terms, term_cutoff)}
 
         completions = []
         if len(query_terms) >= 3:
@@ -85,31 +85,6 @@ class TypingAssistant():
                 key=lambda x: [*self.__lexicon.predict_from_unigrams(x).values()][0],
                 reverse=True,
             )
-
-        suggestions = []
-        if len(completions) >= 1:
-            suggestions = [
-                {'complete_term': completion, 'incomplete_term': query_terms[-1]}
-                for completion in completions
-                if completion != query_terms[-1]
-            ][: self.__max_completions]
-        suggestions.append({})
-        return suggestions
-
-    def _complete(self, query_terms: List[str]) -> List[Dict[str, str]]:
-        bigrams, trigrams = {}, {}
-        if len(query_terms) >= 3:
-            trigrams = self.__lexicon.predict_from_trigrams(query_terms[-3], query_terms[-2])
-        if len(query_terms) >= 2 and len(trigrams) == 0:
-            bigrams = self.__lexicon.predict_from_bigrams(query_terms[-2])
-        candidates = [*(trigrams or bigrams or {*self.__terms})]
-
-        term_cutoff = len(query_terms[-1]) + 1
-        selected_candidates = self.__sequence_similarity.retrieve_similar_terms([query_terms[-1]], candidates, term_cutoff)
-        completions = []
-        if len(selected_candidates) > 0:
-            sorted_candidates = sorted(selected_candidates.items(), key=lambda x: x[1], reverse=True)
-            completions = [completion for completion, _ in sorted_candidates]
 
         suggestions = []
         if len(completions) >= 1:
