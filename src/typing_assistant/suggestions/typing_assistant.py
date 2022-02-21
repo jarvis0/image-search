@@ -8,8 +8,9 @@ from ..indexing import Lexicon
 class TypingAssistant():
 
     def __init__(self, context: Context, lexicon: Lexicon):
-        self.__max_predictions: int = context.max_predictions
-        self.__max_corrections: int = context.max_corrections
+        self.__max_predictions: int = context.max_term_predictions
+        self.__max_corrections: int = context.max_term_corrections
+        self.__max_completions: int = context.max_term_completions
         self.__lexicon: Lexicon = lexicon
         self.__terms: List[str] = lexicon.terms
         self.__sequence_similarity: SequenceSimilarity = SequenceSimilarity(context)
@@ -29,9 +30,9 @@ class TypingAssistant():
         return suggestions
 
     def correct(self, query_terms: List[str]) -> List[Dict[str, str]]:
-        known_term = {query_terms[-1]} & {*self.__terms}
-        sequence_similar_terms = self.__sequence_similarity.retrieve_similar_terms([query_terms[-1]], self.__terms)
-        candidates = known_term or {*sequence_similar_terms}
+        candidates = {query_terms[-1]} & {*self.__terms}
+        if len(candidates) == 0:
+            candidates = {*self.__sequence_similarity.retrieve_similar_terms([query_terms[-1]], self.__terms)}
 
         corrections = []
         if len(query_terms) >= 3:
@@ -61,28 +62,36 @@ class TypingAssistant():
         suggestions.append({})
         return suggestions
 
-    # def complete(self, input_terms: tuple) -> dict:
-    #    bi_grams, tri_grams = [], []
-    #    if len(input_terms) >= 3:
-    #        tri_grams = self.__tgs_freq[input_terms[-3], input_terms[-2]]
-    #    elif len(input_terms) == 2:
-    #        bi_grams = self.__bgs_freq[input_terms[-2]]
-    #    candidates = tri_grams or bi_grams or self.__ugs_freq
-    #    candidates = dict(candidates)
+    def complete(self, query_terms: List[str]) -> List[Dict[str, str]]:
+        candidates = {query_terms[-1]} & {*self.__terms}
+        if len(candidates) == 0:
+            term_cutoff = len(query_terms[-1]) + 1
+            candidates = {*self.__sequence_similarity.retrieve_similar_terms([query_terms[-1]], self.__terms, term_cutoff)}
 
-    #    term_cutoff = len(input_terms[-1]) + 1
-    #    selected_candidates = {}
-    #    for candidate, candidate_freq in candidates.items():
-    #        similarity_score = levenshtein_similarity(input_terms[-1], candidate[: term_cutoff])
-    #        if similarity_score >= self.__configs['term_completion_threshold']:
-    #            selected_candidates[candidate] = similarity_score
+        completions = []
+        if len(query_terms) >= 3:
+            trigrams = self.__lexicon.predict_from_trigrams(query_terms[-3], query_terms[-2])
+            selected_candidates = candidates & {*trigrams}
+            if bool(selected_candidates):
+                completions = sorted(selected_candidates, key=lambda x: trigrams[x], reverse=True)
+        if len(query_terms) >= 2 and len(completions) == 0:
+            bigrams = self.__lexicon.predict_from_bigrams(query_terms[-2])
+            selected_candidates = candidates & {*bigrams}
+            if bool(selected_candidates):
+                completions = sorted(selected_candidates, key=lambda x: bigrams[x], reverse=True)
+        if len(completions) == 0 and len(candidates) >= 1:
+            completions = sorted(
+                candidates,
+                key=lambda x: [*self.__lexicon.predict_from_unigrams(x).values()][0],
+                reverse=True,
+            )
 
-    #    predictions = []
-    #    if len(selected_candidates) > 0:
-    #        selected_candidates = dict(sorted(selected_candidates.items(), key=lambda x: x[1], reverse=True))
-    #        predictions = tuple(selected_candidates.keys())
-
-    #    suggestion = {}
-    #    if len(predictions) >= 1 and predictions[0] != input_terms[-1]:
-    #        suggestion = {'complete_term': predictions[0], 'incomplete_term': input_terms[-1]}
-    #    return suggestion
+        suggestions = []
+        if len(completions) >= 1:
+            suggestions = [
+                {'complete_term': completion, 'incomplete_term': query_terms[-1]}
+                for completion in completions
+                if completion != query_terms[-1]
+            ][: self.__max_completions]
+        suggestions.append({})
+        return suggestions

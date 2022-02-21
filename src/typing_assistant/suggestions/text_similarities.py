@@ -25,11 +25,16 @@ class SequenceSimilarity():
         self.__max_sequence_similarities: int = context.max_sequence_similarities
         self.__sequence_matcher: SequenceMatcher = SequenceMatcher(isjunk=None, autojunk=False)
 
-    def get_nearest_neighbors(self, ref_term: str, terms: List[str]) -> Dict[str, float]:
-        self.__sequence_matcher.set_seq2(ref_term)
+    def get_nearest_neighbors(
+        self,
+        reference_term: str,
+        terms: List[str],
+        term_cutoff: int,
+    ) -> Dict[str, float]:
+        self.__sequence_matcher.set_seq2(reference_term)
         similar_terms = {}
         for term in terms:
-            self.__sequence_matcher.set_seq1(term)
+            self.__sequence_matcher.set_seq1(term[: term_cutoff])
             if self.__sequence_matcher.real_quick_ratio() >= self.__sequence_similarity_cutoff and \
                 self.__sequence_matcher.quick_ratio() >= self.__sequence_similarity_cutoff and \
                     self.__sequence_matcher.ratio() >= self.__sequence_similarity_cutoff:
@@ -41,10 +46,15 @@ class SequenceSimilarity():
         )[: self.__max_sequence_similarities]
         return {term: ratio for term, ratio in most_similar_terms}
 
-    def retrieve_similar_terms(self, reference_terms: List[str], terms: List[str]) -> Dict[str, float]:
+    def retrieve_similar_terms(
+        self,
+        reference_terms: List[str],
+        terms: List[str],
+        term_cutoff: int = 1000,
+    ) -> Dict[str, float]:
         sequence_similar_terms: Dict[str, float] = {}
         for ref_term in reference_terms:
-            new_sequence_similar_terms = self.get_nearest_neighbors(ref_term, terms)
+            new_sequence_similar_terms = self.get_nearest_neighbors(ref_term, terms, term_cutoff)
             sequence_similar_terms = SequenceSimilarity.merge_dicts(
                 sequence_similar_terms,
                 new_sequence_similar_terms,

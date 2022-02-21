@@ -98,8 +98,8 @@ class CLIApp():
             suggestions['term_correction'] = self.__assistant.correct(query_terms)[0]
             if not bool(suggestions['term_correction']):
                 suggestions['term_prediction'] = self.__assistant.predict(query_terms)[0]
-        # else:
-        #     suggestions['term_completion'] = self.__assistant.complete(terms)
+        else:
+            suggestions['term_completion'] = self.__assistant.complete(query_terms)[0]
         return suggestions
 
     def __print_suggestions(self, query: str, suggestions: Dict[str, Any]):
@@ -138,7 +138,7 @@ class CLIApp():
             if not self.__is_allowed(input_char):
                 continue
             if self.__is_escape(input_char):
-                self.__show_images(suggestions['query_completion'])
+                self.__show_images(suggestions['query_completions'])
                 break
             if self.__is_empty(query):
                 if self.__is_space(input_char) or self.__is_apply_suggestion(input_char):
