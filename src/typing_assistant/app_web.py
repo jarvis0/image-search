@@ -5,13 +5,14 @@ from flask import Flask, escape, render_template, request
 from .config import config
 from .context import Context
 from .indexing.indexes_loader import load_indexes
-from .suggestions import OkapiBM25Ranker
+from .suggestions import OkapiBM25Ranker, TypingAssistant
 
 
 def create_web_app():
     context = Context(config.ROOT)
     collection, lexicon, images_handler = load_indexes(config.ROOT)
     ranker = OkapiBM25Ranker(context, collection, lexicon)
+    assistant = TypingAssistant(context, lexicon)
 
     web_app = Flask(
         __name__,
@@ -23,20 +24,35 @@ def create_web_app():
     def index():
         return render_template('index.html')
 
-    @web_app.route('/predict_next_word', methods=['POST'])
-    def predict_next_word():
-        partial_query = str(escape(request.form.get('partial_query')))
-        response = {'next_word_prediction': partial_query}
-        return response
-
-    @web_app.route('/query_partially', methods=['POST'])
-    def query_partially():
+    @web_app.route('/complete', methods=['POST'])
+    def complete():
         partial_query = str(escape(request.form.get('partial_query')))
         query_terms = partial_query.lower().split()
-        query_completions = ranker.lookup_query(query_terms)
-        captions = [query_completion['document'] for query_completion in query_completions]
-        response = {'partial_query_results': captions}
+        completions = ranker.lookup_query(query_terms)
+        response = {'completions': [completion['document'] for completion in completions]}
         return response
+
+    @web_app.route('/predict_term', methods=['POST'])
+    def predict_term():
+        partial_query = str(escape(request.form.get('partial_query')))
+        query_terms = partial_query.lower().split()
+        prediction = assistant.predict(query_terms)[0]
+        return prediction
+
+    @web_app.route('/correct_term', methods=['POST'])
+    def correct_term():
+        partial_query = str(escape(request.form.get('partial_query')))
+        query_terms = partial_query.lower().split()
+        correction = assistant.correct(query_terms)[0]
+        return correction
+
+    @web_app.route('/complete_term', methods=['POST'])
+    def complete_term():
+        partial_query = str(escape(request.form.get('partial_query')))
+        print(len(partial_query))
+        query_terms = partial_query.lower().split()
+        correction = assistant.complete(query_terms)[0]
+        return correction
 
     @web_app.route('/query', methods=['POST'])
     def query():

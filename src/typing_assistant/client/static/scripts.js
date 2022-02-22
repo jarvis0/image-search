@@ -1,3 +1,15 @@
+$("#query").on("input", function() {
+    var input_text = $(this).val();
+    var input_char = input_text.slice(-1).toLowerCase();
+    var secondlast_char = input_text.slice(-2, -1)
+    if (!(
+        (input_char >= 'a' && input_char <= 'z') ||
+        (input_char == ' ' && secondlast_char != ' ' && input_text != ' ')
+    )) {
+        this.value = input_text.slice(0, -1);
+    }
+});
+
 function autocomplete(inp, arr) {
     /*the autocomplete function takes two arguments,
     the text field element and an array of possible autocompleted values:*/
@@ -93,30 +105,61 @@ function autocomplete(inp, arr) {
 }
 
 /*execute a function when someone writes in the text field:*/
-var timer = 0;
+var timer_completion = 0;
 $("#query").on("input", function() {
-    partial_query = $(this).val();
-    if (timer) {
-        clearTimeout(timer);
+    if (timer_completion) {
+        clearTimeout(timer_completion);
     }
-    timer = setTimeout(function() {
-        $.post("/query_partially", {"partial_query": partial_query}).done(function(response) {
-            autocomplete(document.getElementById("query"), response.partial_query_results);
+    partial_query = $(this).val();
+    if (partial_query.length == 0) return false;
+    timer_completion = setTimeout(function() {
+        $.post("/complete", {"partial_query": partial_query}).done(function(response) {
+            autocomplete(document.getElementById("query"), response.completions);
         });
     }, 300);
 });
 
 /*execute a function when someone writes in the text field:*/
-var timer = 0;
+var timer_term_prediction = 0;
 $("#query").on("input", function() {
-    partial_query = $(this).val();
-    if (partial_query.slice(-1) != ' ') return false;
-    if (timer) {
-        clearTimeout(timer);
+    if (timer_term_prediction) {
+        clearTimeout(timer_term_prediction);
     }
-    timer = setTimeout(function() {
-        $.post("/predict_next_word", {"partial_query": partial_query}).done(function(response) {
-            console.log(response.next_word_prediction);
+    partial_query = $(this).val();
+    if (partial_query.length == 0 || partial_query.slice(-1) != ' ') return false;
+    timer_term_prediction = setTimeout(function() {
+        $.post("/predict_term", {"partial_query": partial_query}).done(function(response) {
+            console.log("next_term: " + response.next_term);
+        });
+    }, 300);
+});
+
+/*execute a function when someone writes in the text field:*/
+var timer_term_correction = 0;
+$("#query").on("input", function() {
+    if (timer_term_correction) {
+        clearTimeout(timer_term_correction);
+    }
+    partial_query = $(this).val();
+    if (partial_query.length == 0 || partial_query.slice(-1) != ' ') return false;
+    timer_term_correction = setTimeout(function() {
+        $.post("/correct_term", {"partial_query": partial_query}).done(function(response) {
+            console.log("correction: " + response.correct_term);
+        });
+    }, 300);
+});
+
+/*execute a function when someone writes in the text field:*/
+var timer_term_completion = 0;
+$("#query").on("input", function() {
+    if (timer_term_completion) {
+        clearTimeout(timer_term_completion);
+    }
+    partial_query = $(this).val();
+    if (partial_query.length == 0) return false;
+    timer_term_completion = setTimeout(function() {
+        $.post("/complete_term", {"partial_query": partial_query}).done(function(response) {
+            console.log("completion: " + response.complete_term);
         });
     }, 300);
 });
