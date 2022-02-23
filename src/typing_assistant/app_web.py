@@ -49,7 +49,6 @@ def create_web_app():
     @web_app.route('/complete_term', methods=['POST'])
     def complete_term():
         partial_query = str(escape(request.form.get('partial_query')))
-        print(len(partial_query))
         query_terms = partial_query.lower().split()
         correction = assistant.complete(query_terms)[0]
         return correction
