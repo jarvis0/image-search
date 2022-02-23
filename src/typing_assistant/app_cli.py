@@ -131,7 +131,7 @@ class CLIApp():
 
     def run(self):
         self.__init_insertion_print()
-        suggestions = None
+        suggestions = CLIApp.init_suggestions()
         query = self.__special_characters['empty']
         while True:
             input_char = CLIApp.acquire_input_char()

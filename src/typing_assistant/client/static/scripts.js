@@ -1,4 +1,19 @@
-function autocomplete(inp, arr) {
+function check_input(obj) {
+    var input_text = $(obj).val();
+    var input_char = input_text.slice(-1).toLowerCase();
+    var secondlast_char = input_text.slice(-2, -1);
+    cleaned = false;
+    if (!(
+        (input_char >= 'a' && input_char <= 'z') ||
+        (input_char == ' ' && secondlast_char != ' ' && input_text != ' ')
+    )) {
+        obj.value = input_text.slice(0, -1);
+        cleaned = true;
+    }
+    return cleaned
+}
+
+function autocomplete(inp) {
     /*the autocomplete function takes two arguments,
     the text field element and an array of possible autocompleted values:*/
     var currentFocus;
@@ -12,6 +27,25 @@ function autocomplete(inp, arr) {
     a.setAttribute("class", "autocomplete-items");
     /*append the DIV element as a child of the autocomplete container:*/
     inp.parentNode.appendChild(a);
+    var arr;
+    console.log(term_correction, term_completion, term_prediction)
+    if (term_correction.length == 1) {
+        arr = term_correction.concat(completions)
+    }
+    else {
+        if (term_completion.length == 1) {
+            arr = term_completion.concat(completions)
+        }
+        else {
+            if (term_prediction.length == 1) {
+                arr = term_prediction.concat(completions)
+            }
+            else {
+                arr = completions
+            }
+        }
+    }
+    //term_completion.concat(term_correction, term_prediction, completions)
     /*for each item in the array...*/
     for (var i = 0; i < arr.length; i++) {
         /*create a DIV element for each matching element:*/
@@ -22,7 +56,9 @@ function autocomplete(inp, arr) {
         /*execute a function when someone clicks on the item value (DIV element):*/
         b.addEventListener("click", function(e) {
             /*insert the value for the autocomplete text field:*/
-            inp.value = this.getElementsByTagName("input")[0].value;
+            selection = this.getElementsByTagName("input")[0].value;
+            selection = selection.replace(/ *\([^)]*\) */g, "");
+            inp.value = selection.slice(3, -4)
             /*close the list of autocompleted values,
             (or any other open lists of autocompleted values:*/
             closeAllLists();
@@ -93,30 +129,96 @@ function autocomplete(inp, arr) {
 }
 
 /*execute a function when someone writes in the text field:*/
-var timer = 0;
+var timer_completion = 0;
+var completions = [];
 $("#query").on("input", function() {
-    partial_query = $(this).val();
-    if (timer) {
-        clearTimeout(timer);
+    cleaned = check_input(this);
+    if (timer_completion) {
+        clearTimeout(timer_completion);
     }
-    timer = setTimeout(function() {
-        $.post("/query_partially", {"partial_query": partial_query}).done(function(response) {
-            autocomplete(document.getElementById("query"), response.partial_query_results);
+    partial_query = $(this).val();
+    if (partial_query.length == 0 || cleaned) return false;
+    timer_completion = setTimeout(function() {
+        $.post("/complete", {"partial_query": partial_query}).done(function(response) {
+            completions = response.completions;
+            autocomplete(document.getElementById("query"));
         });
     }, 300);
 });
 
 /*execute a function when someone writes in the text field:*/
-var timer = 0;
+var timer_term_prediction = 0;
+var term_prediction = [];
 $("#query").on("input", function() {
-    partial_query = $(this).val();
-    if (partial_query.slice(-1) != ' ') return false;
-    if (timer) {
-        clearTimeout(timer);
+    cleaned = check_input(this);
+    if (timer_term_prediction) {
+        clearTimeout(timer_term_prediction);
     }
-    timer = setTimeout(function() {
-        $.post("/predict_next_word", {"partial_query": partial_query}).done(function(response) {
-            console.log(response.next_word_prediction);
+    partial_query = $(this).val();
+    if (partial_query.length == 0 || partial_query.slice(-1) != ' ' || cleaned) {
+        term_prediction = []
+        return false;
+    }
+    timer_term_prediction = setTimeout(function() {
+        term_prediction = []
+        $.post("/predict_term", {"partial_query": partial_query}).done(function(response) {
+            console.log("next_term: " + response.next_term);
+            if (response.next_term != null) {
+                term_prediction = ["<i>(term prediction) " + partial_query + response.next_term + "</i>"];
+            }
+            autocomplete(document.getElementById("query"));
+        });
+    }, 300);
+});
+
+/*execute a function when someone writes in the text field:*/
+var timer_term_correction = 0;
+var term_correction = [];
+$("#query").on("input", function() {
+    cleaned = check_input(this);
+    if (timer_term_correction) {
+        clearTimeout(timer_term_correction);
+    }
+    partial_query = $(this).val();
+    if (partial_query.length == 0 || partial_query.slice(-1) != ' ' || cleaned) {
+        term_correction = []
+        return false;
+    }
+    timer_term_correction = setTimeout(function() {
+        $.post("/correct_term", {"partial_query": partial_query}).done(function(response) {
+            term_correction = []
+            console.log("correction: " + response.correct_term);
+            if (response.correct_term != null) {
+                partial_query = partial_query.split(" ").slice(0, -2).join(" ") + " ";
+                term_correction = ["<i>(term correction) " + partial_query + response.correct_term + "</i>"]
+            }
+            autocomplete(document.getElementById("query"));
+        });
+    }, 300);
+});
+
+/*execute a function when someone writes in the text field:*/
+var timer_term_completion = 0;
+var term_completion = [];
+$("#query").on("input", function() {
+    cleaned = check_input(this);
+    if (timer_term_completion) {
+        clearTimeout(timer_term_completion);
+    }
+    partial_query = $(this).val();
+    if (partial_query.length == 0 || cleaned) {
+        term_completion = []
+        return false;
+    }
+    timer_term_completion = setTimeout(function() {
+        $.post("/complete_term", {"partial_query": partial_query}).done(function(response) {
+            term_completion = []
+            console.log("completion: " + response.complete_term);
+            if (response.complete_term != null) {
+                partial_query = partial_query.split(" ").slice(0, -1).join(" ") + " ";
+                term_completion = ["<i>(term completion) " + partial_query + response.complete_term + "</i>"];
+            }
+            autocomplete(document.getElementById("query"));
         });
     }, 300);
 });
