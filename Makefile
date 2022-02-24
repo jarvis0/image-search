@@ -43,9 +43,6 @@ else
 	@echo ">>> ERROR: Conda not found.\n"
 endif
 
-up:
-	bash entrypoint.sh
-
 init:
 	python -m typing_assistant.app_init
 
