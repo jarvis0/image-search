@@ -34,7 +34,7 @@ training_path = 'scripts/semantic_learning/trainings/unsupervised/' + training_n
 os.makedirs(training_path, exist_ok=True)
 model.save_model(training_path + 'unsupervised_model.bin')
 
-log_path = 'scripts/semantic_learning/temp/'
+log_path = 'scripts/semantic_learning/training_experiments/temp/'
 with open(log_path + 'training.log') as fp:
     loss = [float(line.split()[7]) for line in fp.readlines() if line.startswith('Progress:')]
 plt.figure(figsize=(16, 4))

@@ -52,7 +52,7 @@ web:
 ## Update project version ($increment=[major|minor|patch])
 version:
 ifeq ($(shell git branch | grep \* | cut -d ' ' -f2), main)
-	python version_maker.py ${increment}
+	python scripts/version_maker.py ${increment}
 else
 	@echo -e ">>> ERROR: no new version applied.\n"
 endif

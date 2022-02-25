@@ -38,7 +38,7 @@ _, precision, recall = model.test('data/corpus_valid.txt', k=1)
 f1_score = 2 * (recall * precision) / (recall + precision)
 model.save_model(training_path + 'supervised_model.bin')
 
-log_path = 'scripts/semantic_learning/temp/'
+log_path = 'scripts/semantic_learning/training_experiments/temp/'
 with open(log_path + 'training.log') as fp:
     loss = [float(line.split()[7]) for line in fp.readlines() if line.startswith('Progress:')]
 plt.figure(figsize=(16, 4))
