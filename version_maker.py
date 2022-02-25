@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-
 import sys
 from configparser import ConfigParser
 from subprocess import call
-from typing import List
+from typing import List, Literal
 
 
 def read_current_version(setup_file) -> List[int]:
@@ -11,8 +9,10 @@ def read_current_version(setup_file) -> List[int]:
     return [int(n) for n in version.split('.')]
 
 
-def increment_version(current_version_as_list: List[int], increment: str) -> str:
-    new_version = None
+def increment_version(
+    current_version_as_list: List[int],
+    increment: Literal['patch', 'minor', 'major'],
+) -> str:
     major, minor, patch = current_version_as_list
     if increment == 'patch':
         new_version = [major, minor, patch + 1]
@@ -34,7 +34,7 @@ def confirm_version(new_version):
 def validate_increment(increment: str) -> None:
     if increment in {'patch', 'minor', 'major'}:
         return
-    print('Usage: python -m scripts.version [major|minor|patch]')
+    print('Usage: python version_maker.py [major|minor|patch]')
     sys.exit(1)
 
 

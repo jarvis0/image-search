@@ -30,9 +30,9 @@ model = fasttext.train_unsupervised(
     verbose=2,
 )
 training_name = f'fasttext_dim-{dim}_epoch-{epoch}_loss-{loss_f}_nongrams'
-training_path = 'scripts/semantic_learning/trainings/' + training_name + '/'
+training_path = 'scripts/semantic_learning/trainings/unsupervised/' + training_name + '/'
 os.makedirs(training_path, exist_ok=True)
-model.save_model(training_path + 'supervised_model.bin')
+model.save_model(training_path + 'unsupervised_model.bin')
 
 log_path = 'scripts/semantic_learning/temp/'
 with open(log_path + 'training.log') as fp:

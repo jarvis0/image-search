@@ -22,9 +22,6 @@ install:
 clean:
 	find . -type f -name "*.py[co]" -delete
 	find . -type d -name "__pycache__" -delete
-	rm -rf data/raw/*
-	rm -rf data/preprocess/*
-	rm -rf outputs/*
 	python -m scripts.submodules deinit
 	rm -rf thrift_py
 	conda env remove -n $(PROJECT_NAME) -y
@@ -38,9 +35,9 @@ conda:
 ifeq (True,$(HAS_CONDA))
 	@echo ">>> Detected conda, creating conda environment."
 	conda create --name $(PROJECT_NAME) python=$(PYTHON_VERSION) -y
-	@echo ">>> New conda env created. Activate with:\nsource activate $(PROJECT_NAME)"
+	@echo -e ">>> New conda env created. Activate with:\nsource activate $(PROJECT_NAME)"
 else
-	@echo ">>> ERROR: Conda not found.\n"
+	@echo -e ">>> ERROR: Conda not found.\n"
 endif
 
 init:
@@ -55,9 +52,9 @@ web:
 ## Update project version ($increment=[major|minor|patch])
 version:
 ifeq ($(shell git branch | grep \* | cut -d ' ' -f2), main)
-	python -m scripts.version ${increment}
+	python version_maker.py ${increment}
 else
-	@echo ">>> ERROR: no new version applied.\n"
+	@echo -e ">>> ERROR: no new version applied.\n"
 endif
 
 

@@ -64,7 +64,7 @@ class SequenceSimilarity():
 
 class SemanticSimilarity():
 
-    SEMANTIC_MODEL_PATH: str = 'binaries/semantic_model.bin'
+    SEMANTIC_MODEL_PATH: str = 'binaries/unsupervised_model.bin'
 
     def __init__(self, context: Context):
         self.__semantic_similarity_cutoff: float = context.semantic_similarity_cutoff

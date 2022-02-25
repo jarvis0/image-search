@@ -131,10 +131,11 @@ dmypy.json
 # Others
 .vscode
 .DS_Store
-scripts/**/*.bin
+.git.bfg-report
+*.bin
+*.pkl
 binaries/0.5
 binaries/1
 data/captions_0.5.tsv
 data/captions_1.tsv
-.git.bfg-report
 data/*.txt
