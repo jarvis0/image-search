@@ -1,3 +1,4 @@
+import argparse
 import time
 
 import pandas as pd
@@ -8,7 +9,11 @@ from .indexing import Collection, ImagesHandler, InvertedIndex, Lexicon
 
 
 if __name__ == '__main__':
-    df = pd.read_csv('data/captions_0.1.tsv', sep='\t', index_col='id')
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input_file', type=str, default='data/captions_0.1.tsv')
+    args = parser.parse_args()
+
+    df = pd.read_csv(args.input_file, sep='\t', index_col='id')
     corpus = df['caption'].to_dict()
     context = Context(config.ROOT)
     print('number of sentences:', len(corpus))

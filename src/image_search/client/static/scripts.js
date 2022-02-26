@@ -28,7 +28,6 @@ function autocomplete(inp) {
     /*append the DIV element as a child of the autocomplete container:*/
     inp.parentNode.appendChild(a);
     var arr;
-    console.log(term_correction, term_completion, term_prediction)
     if (term_correction.length == 1) {
         arr = term_correction.concat(completions)
     }
@@ -57,7 +56,8 @@ function autocomplete(inp) {
         b.addEventListener("click", function(e) {
             /*insert the value for the autocomplete text field:*/
             selection = this.getElementsByTagName("input")[0].value;
-            inp.value = selection.replace(/ *\<i>[^</]*\<\/i> */g, "");
+            selection = selection.replace(/ *\<i>[^</]*\<\/i> */g, "");
+            inp.value = selection.match(/[a-z]+/g).join(" ");
             /*close the list of autocompleted values,
             (or any other open lists of autocompleted values:*/
             closeAllLists();
@@ -161,7 +161,6 @@ $("#query").on("input", function() {
     timer_term_prediction = setTimeout(function() {
         term_prediction = []
         $.post("/predict_term", {"partial_query": partial_query}).done(function(response) {
-            console.log("next_term: " + response.next_term);
             if (response.next_term != null) {
                 term_prediction = ["<i>(term prediction) </i>" + partial_query + response.next_term];
             }
@@ -186,7 +185,6 @@ $("#query").on("input", function() {
     timer_term_correction = setTimeout(function() {
         $.post("/correct_term", {"partial_query": partial_query}).done(function(response) {
             term_correction = []
-            console.log("correction: " + response.correct_term);
             if (response.correct_term != null) {
                 partial_query = partial_query.split(" ").slice(0, -2).join(" ") + " ";
                 term_correction = ["<i>(term correction) </i>" + partial_query + response.correct_term]
@@ -212,7 +210,6 @@ $("#query").on("input", function() {
     timer_term_completion = setTimeout(function() {
         $.post("/complete_term", {"partial_query": partial_query}).done(function(response) {
             term_completion = []
-            console.log("completion: " + response.complete_term);
             if (response.complete_term != null) {
                 partial_query = partial_query.split(" ").slice(0, -1).join(" ") + " ";
                 term_completion = ["<i>(term completion) </i>" + partial_query + response.complete_term];

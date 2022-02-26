@@ -9,7 +9,7 @@ import nltk
 
 class Context():
 
-    CONFIG_PATH: str = 'src/typing_assistant/config/configs.json'
+    CONFIG_PATH: str = 'src/image_search/config/configs.json'
 
     def __init__(self, root: str):
         with open(join(root, Context.CONFIG_PATH)) as fp:

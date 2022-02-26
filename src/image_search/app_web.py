@@ -16,8 +16,8 @@ def create_web_app():
 
     web_app = Flask(
         __name__,
-        template_folder=join(config.ROOT, 'src/typing_assistant/client/templates'),
-        static_folder=join(config.ROOT, 'src/typing_assistant/client/static'),
+        template_folder=join(config.ROOT, 'src/image_search/client/templates'),
+        static_folder=join(config.ROOT, 'src/image_search/client/static'),
     )
 
     @web_app.route('/')

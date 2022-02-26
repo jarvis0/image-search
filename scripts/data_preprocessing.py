@@ -7,7 +7,7 @@ import pandas as pd
 RANDOM_STATE = 42
 
 
-def sample_data(input_file: str, output_path: str, sample_fraction: float):
+def preprocess_data(input_file: str, output_path: str, sample_fraction: float):
     df = pd.read_csv(
         input_file,
         sep='\t',
@@ -27,4 +27,4 @@ if __name__ == '__main__':
     parser.add_argument('--sample_fraction', type=float, default=0.1)
 
     args = parser.parse_args()
-    sample_data(args.input_file, args.output_path, args.sample_fraction)
+    preprocess_data(args.input_file, args.output_path, args.sample_fraction)

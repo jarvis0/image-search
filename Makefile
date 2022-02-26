@@ -43,13 +43,17 @@ else
 endif
 
 init:
-	python -m typing_assistant.app_init
+ifeq (${input_file}, ${""})
+	python -m image_search.app_init
+else
+	python -m image_search.app_init --input_file ${input_file}
+endif
 
 cli:
-	python -m typing_assistant.app_cli
+	python -m image_search.app_cli
 
 web:
-	python -m typing_assistant.app_web
+	python -m image_search.app_web
 
 ## Update project version ($increment=[major|minor|patch])
 version:
