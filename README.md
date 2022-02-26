@@ -1,6 +1,5 @@
 # typing-assistant
 Codebase for a question auto-completion proof of concept.
-Research is available on [Confluence](https://igenius.atlassian.net/wiki/spaces/CF/pages/1919025801/Question+auto-completion+Research).
 
 ### Experimental
 ![](demo.gif)
