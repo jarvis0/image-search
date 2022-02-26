@@ -9,6 +9,9 @@ MAX_LABELS = 1
 TRAIN_FRACTION = 0.7
 VALID_FRACTION = 1 - TRAIN_FRACTION
 REGEX = r'[a-z]+'
+OUTPUT_FILE_NAME = 'corpus_supervised.txt'
+OUTPUT_FILE_NAME_TRAIN = 'corpus_train.txt'
+OUTPUT_FILE_NAME_VALID = 'corpus_valid.txt'
 
 
 def tokenize_supervised(sample):
@@ -28,14 +31,14 @@ def preprocess_supervised_data(input_file: str, output_path: str, train_valid_sp
     corpus = corpus_df['tokenized_corpus'].tolist()
     print(len(corpus), corpus[0])
     if not train_valid_split:
-        with open(join(output_path, 'corpus_supervised.txt'), 'w', encoding='utf-8') as fp:
+        with open(join(output_path, OUTPUT_FILE_NAME), 'w', encoding='utf-8') as fp:
             for sentence in corpus:
                 fp.write(sentence)
     else:
-        with open(join(output_path, 'corpus_train.txt'), 'w', encoding='utf-8') as fp:
+        with open(join(output_path, OUTPUT_FILE_NAME_TRAIN), 'w', encoding='utf-8') as fp:
             for sentence in corpus[: int(len(corpus) * TRAIN_FRACTION)]:
                 fp.write(sentence)
-        with open(join(output_path, 'corpus_valid.txt'), 'w', encoding='utf-8') as fp:
+        with open(join(output_path, OUTPUT_FILE_NAME_VALID), 'w', encoding='utf-8') as fp:
             for sentence in corpus[-int(len(corpus) * VALID_FRACTION):]:
                 fp.write(sentence)
 

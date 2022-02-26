@@ -6,6 +6,7 @@ import pandas as pd
 
 
 REGEX = r'[a-z]+'
+OUTPUT_FILE_NAME = 'corpus_unsupervised.txt'
 
 
 def tokenize_unsupervised(sample):
@@ -23,7 +24,7 @@ def preprocess_unsupervised_data(input_file: str, output_path: str):
     corpus_df['tokenized_corpus'] = corpus_df.apply(tokenize_unsupervised, axis=1)
     corpus = corpus_df['tokenized_corpus'].tolist()
     print(len(corpus), corpus[0])
-    with open(join(output_path, 'corpus_unsupervised.txt'), 'w', encoding='utf-8') as fp:
+    with open(join(output_path, OUTPUT_FILE_NAME), 'w', encoding='utf-8') as fp:
         for sentence in corpus:
             fp.write(sentence)
 
