@@ -13,6 +13,7 @@ HAS_CONDA=True
 endif
 
 requirements:
+	pip install --upgrade pip
 	pip install -U pip setuptools wheel
 	pip install .'[dev,lint,test]'
 
@@ -20,13 +21,11 @@ install:
 	pip install .
 
 clean:
-	find . -type f -name "*.py[co]" -delete
-	find . -type d -name "__pycache__" -delete
-	rm -rf data/raw/*
-	rm -rf data/preprocess/*
-	rm -rf outputs/*
-	python -m scripts.submodules deinit
-	rm -rf thrift_py
+	find . -type d -name "__pycache__" -exec rm -rf {} +
+	find . -type d -name "build" -exec rm -rf {} +
+	find . -type d -name ".ipynb_checkpoints" -exec rm -rf {} +
+	find . -type d -name "*.egg-info" -exec rm -rf {} +
+	find . -type d -name ".mypy_cache" -exec rm -rf {} +
 	conda env remove -n $(PROJECT_NAME) -y
 
 ## Lint using flake8
@@ -38,29 +37,30 @@ conda:
 ifeq (True,$(HAS_CONDA))
 	@echo ">>> Detected conda, creating conda environment."
 	conda create --name $(PROJECT_NAME) python=$(PYTHON_VERSION) -y
-	@echo ">>> New conda env created. Activate with:\nsource activate $(PROJECT_NAME)"
+	@echo -e ">>> New conda env created. Activate with:\nsource activate $(PROJECT_NAME)"
 else
-	@echo ">>> ERROR: Conda not found.\n"
+	@echo -e ">>> ERROR: Conda not found.\n"
 endif
 
-up:
-	bash entrypoint.sh
-
 init:
-	python -m typing_assistant.app_init
+ifeq (${input_file}, ${""})
+	python -m image_search.app_init
+else
+	python -m image_search.app_init --input_file ${input_file}
+endif
 
 cli:
-	python -m typing_assistant.app_cli
+	python -m image_search.app_cli
 
 web:
-	python -m typing_assistant.app_web
+	python -m image_search.app_web
 
 ## Update project version ($increment=[major|minor|patch])
 version:
 ifeq ($(shell git branch | grep \* | cut -d ' ' -f2), main)
-	python -m scripts.version ${increment}
+	python scripts/version_maker.py ${increment}
 else
-	@echo ">>> ERROR: no new version applied.\n"
+	@echo -e ">>> ERROR: no new version applied.\n"
 endif
 
 

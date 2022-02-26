@@ -56,9 +56,4 @@ setup(
             'pytest-cov<3.0.0',
         ],
     },
-    entry_points={
-        'console_scripts': [
-            'assist = typing_assistant.assist:main',
-        ],
-    },
 )
