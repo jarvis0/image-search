@@ -19,8 +19,6 @@ setup(
     zip_safe=False,
     install_requires=[
         'python-decouple==3.5',
-        'fastapi==0.70.0',
-        'uvicorn==0.16.0',
         'numpy==1.21.4',
         'pandas==1.3.4',
         'scipy==1.8.0rc1',
