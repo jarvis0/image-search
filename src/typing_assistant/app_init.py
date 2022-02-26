@@ -13,7 +13,7 @@ if __name__ == '__main__':
     context = Context(config.ROOT)
     print('number of sentences:', len(corpus))
     tic = time.time()
-    collection = Collection()
+    collection = Collection(context)
     collection.build_collection(corpus)
     print('build collection', time.time() - tic)
     tic = time.time()

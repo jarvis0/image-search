@@ -1,6 +1,6 @@
 from typing import Dict, List
 
-from .text_similarities import SequenceSimilarity
+from .term_similarities import SequenceSimilarity
 from ..context import Context
 from ..indexing import Lexicon
 

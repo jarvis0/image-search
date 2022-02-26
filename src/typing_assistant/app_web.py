@@ -63,7 +63,7 @@ def create_web_app():
             query_completion['document'],
             round(query_completion['score'], 4),
         ) for query_completion in query_completions]
-        return render_template('query.html', query=query, query_results=query_results)
+        return render_template('query_results.html', query=query, query_results=query_results)
 
     return web_app
 

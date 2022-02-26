@@ -1,6 +1,6 @@
 from collections import defaultdict
 from difflib import SequenceMatcher
-from typing import DefaultDict, Dict, List
+from typing import DefaultDict, Dict, List, Set
 
 import fasttext as ft
 
@@ -9,15 +9,15 @@ from ..context import Context
 ft.FastText.eprint = lambda x: None
 
 
-class SequenceSimilarity():
+def merge_dicts(*dicts: Dict[str, float]) -> Dict[str, float]:
+    res: DefaultDict[str, float] = defaultdict(float)
+    for d in dicts:
+        for k, v in d.items():
+            res[k] += v
+    return {**res}
 
-    @staticmethod
-    def merge_dicts(*dicts: Dict[str, float]) -> Dict[str, float]:
-        res: DefaultDict[str, float] = defaultdict(float)
-        for d in dicts:
-            for k, v in d.items():
-                res[k] += v
-        return {**res}
+
+class SequenceSimilarity():
 
     def __init__(self, context: Context):
         super().__init__()
@@ -55,7 +55,7 @@ class SequenceSimilarity():
         sequence_similar_terms: Dict[str, float] = {}
         for ref_term in reference_terms:
             new_sequence_similar_terms = self.get_nearest_neighbors(ref_term, terms, term_cutoff)
-            sequence_similar_terms = SequenceSimilarity.merge_dicts(
+            sequence_similar_terms = merge_dicts(
                 sequence_similar_terms,
                 new_sequence_similar_terms,
             )
@@ -71,13 +71,28 @@ class SemanticSimilarity():
         self.__max_semantic_similarities: int = context.max_semantic_similarities
         self.__semantic_model: ft.FastText = ft.load_model(SemanticSimilarity.SEMANTIC_MODEL_PATH)
 
-    def retrieve_similar_terms(self, terms: List[str]) -> Dict[str, float]:
-        semantic_similar_terms: DefaultDict[str, float] = defaultdict(float)
+    def get_nearest_neighbors(self, reference_term: str, stop_terms: Set[str]):
+        similar_terms = {}
+        for confidence, neighbor in self.__semantic_model.get_nearest_neighbors(
+            reference_term,
+            k=10,
+        ):
+            if confidence >= self.__semantic_similarity_cutoff and \
+               neighbor != '</s>' and neighbor not in stop_terms:
+                similar_terms[neighbor] = confidence
+        most_similar_terms = sorted(
+            similar_terms.items(),
+            key=lambda x: x[1],
+            reverse=True,
+        )[: self.__max_semantic_similarities]
+        return {term: ratio for term, ratio in most_similar_terms}
+
+    def retrieve_similar_terms(self, terms: List[str], stop_terms: Set[str]) -> Dict[str, float]:
+        semantic_similar_terms: Dict[str, float] = {}
         for q_term in terms:
-            for confidence, neighbor in self.__semantic_model.get_nearest_neighbors(
-                    q_term,
-                    k=self.__max_semantic_similarities,
-            ):
-                if confidence >= self.__semantic_similarity_cutoff and neighbor != '</s>':
-                    semantic_similar_terms[neighbor] += confidence
-        return {**semantic_similar_terms}
+            new_semantic_similar_terms = self.get_nearest_neighbors(q_term, stop_terms)
+            semantic_similar_terms = merge_dicts(
+                semantic_similar_terms,
+                new_semantic_similar_terms,
+            )
+        return semantic_similar_terms

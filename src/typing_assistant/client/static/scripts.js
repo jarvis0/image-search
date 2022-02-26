@@ -57,8 +57,7 @@ function autocomplete(inp) {
         b.addEventListener("click", function(e) {
             /*insert the value for the autocomplete text field:*/
             selection = this.getElementsByTagName("input")[0].value;
-            selection = selection.replace(/ *\([^)]*\) */g, "");
-            inp.value = selection.slice(3, -4)
+            inp.value = selection.replace(/ *\<i>[^</]*\<\/i> */g, "");
             /*close the list of autocompleted values,
             (or any other open lists of autocompleted values:*/
             closeAllLists();
@@ -164,7 +163,7 @@ $("#query").on("input", function() {
         $.post("/predict_term", {"partial_query": partial_query}).done(function(response) {
             console.log("next_term: " + response.next_term);
             if (response.next_term != null) {
-                term_prediction = ["<i>(term prediction) " + partial_query + response.next_term + "</i>"];
+                term_prediction = ["<i>(term prediction) </i>" + partial_query + response.next_term];
             }
             autocomplete(document.getElementById("query"));
         });
@@ -190,7 +189,7 @@ $("#query").on("input", function() {
             console.log("correction: " + response.correct_term);
             if (response.correct_term != null) {
                 partial_query = partial_query.split(" ").slice(0, -2).join(" ") + " ";
-                term_correction = ["<i>(term correction) " + partial_query + response.correct_term + "</i>"]
+                term_correction = ["<i>(term correction) </i>" + partial_query + response.correct_term]
             }
             autocomplete(document.getElementById("query"));
         });
@@ -216,7 +215,7 @@ $("#query").on("input", function() {
             console.log("completion: " + response.complete_term);
             if (response.complete_term != null) {
                 partial_query = partial_query.split(" ").slice(0, -1).join(" ") + " ";
-                term_completion = ["<i>(term completion) " + partial_query + response.complete_term + "</i>"];
+                term_completion = ["<i>(term completion) </i>" + partial_query + response.complete_term];
             }
             autocomplete(document.getElementById("query"));
         });

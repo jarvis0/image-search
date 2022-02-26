@@ -1,7 +1,7 @@
 from collections import Counter
 from typing import Dict, List, Set
 
-from .text_similarities import SemanticSimilarity, SequenceSimilarity
+from .term_similarities import SemanticSimilarity, SequenceSimilarity
 from ..context import Context
 from ..indexing import Lexicon
 
@@ -26,6 +26,6 @@ class QueryExpander:
         filtered_query_terms = {*query_terms} - self.__stop_terms
         unknown_terms = filtered_query_terms - {*self.__terms}
         known_query_terms = [w for w in filtered_query_terms if w not in unknown_terms]
-        query_expansion = self.__semantic_similarity.retrieve_similar_terms(known_query_terms)
+        query_expansion = self.__semantic_similarity.retrieve_similar_terms(known_query_terms, self.__stop_terms)
         query_expansion.update(dict(Counter(known_query_terms)))
         return query_expansion

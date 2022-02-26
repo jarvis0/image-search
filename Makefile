@@ -13,6 +13,7 @@ HAS_CONDA=True
 endif
 
 requirements:
+	pip install --upgrade pip
 	pip install -U pip setuptools wheel
 	pip install .'[dev,lint,test]'
 
@@ -20,10 +21,11 @@ install:
 	pip install .
 
 clean:
-	find . -type f -name "*.py[co]" -delete
-	find . -type d -name "__pycache__" -delete
-	python -m scripts.submodules deinit
-	rm -rf thrift_py
+	find . -type d -name "__pycache__" -exec rm -rf {} +
+	find . -type d -name "build" -exec rm -rf {} +
+	find . -type d -name ".ipynb_checkpoints" -exec rm -rf {} +
+	find . -type d -name "*.egg-info" -exec rm -rf {} +
+	find . -type d -name ".mypy_cache" -exec rm -rf {} +
 	conda env remove -n $(PROJECT_NAME) -y
 
 ## Lint using flake8
