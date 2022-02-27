@@ -20,8 +20,10 @@
 
 [![Project license](https://img.shields.io/badge/license-all%20rights%20reserved-lightgrey)](LICENSE)
 [![Pull Requests welcome](https://img.shields.io/badge/PRs-welcome-orange)](https://github.com/jarvis0/image-search/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22)
-[![code by jarvis0](https://img.shields.io/badge/%3C%2F%3E%20by-jarvis0-green)](https://github.com/jarvis0)
+[![code by jarvis0](https://img.shields.io/badge/%3C%2F%3E%20by-jarvis0-lightblue)](https://github.com/jarvis0)
 ![python](https://img.shields.io/badge/python-3.8-blue)
+![lint](https://img.shields.io/badge/lint-passing-brightgreen)
+![mypy](https://img.shields.io/badge/mypy-passing-brightgreen)
 </div>
 
 <details open="open">
@@ -80,15 +82,15 @@ The code has been developed using Python v3.8.11 and Anaconda v4.10.1. We cannot
 ### Installation
 
 We encourage you to create a fresh Anaconda environment for the installation.
-```
-$ git clone https://github.com/jarvis0/image-search.git
-$ cd image-search
-$ pip install .
+```sh
+git clone https://github.com/jarvis0/image-search.git
+cd image-search
+pip install .
 ```
 
-At this point you will need to download the database containing the image captions and their corresponding URLs. You can find the file at this [link](https://storage.cloud.google.com/conceptual-captions-v1-1-labels/Image_Labels_Subset_Train_GCC-Labels-training.tsv?_ga=2.234395421.-20118413.1607637118), provided that you are logged in with a valid Google account. Once the file is downloaded you will have to run the following command:
-```
-$ python scripts/data_preprocessing.py --sample_fraction <value in the interval (0, 1]>
+At this point you will need to download the database containing the image captions and their corresponding URLs. You can find the file at this [link](https://storage.cloud.google.com/conceptual-captions-v1-1-labels/Image_Labels_Subset_Train_GCC-Labels-training.tsv?_ga=2.234395421.-20118413.1607637118), provided that you are logged in with as valid Google account. Once the file is downloaded you will have to run the following command:
+```sh
+python scripts/data_preprocessing.py --sample_fraction <value in the interval (0, 1]>
 ```
 By default this command assumes the downloaded file to be under the folder `data` and to be named as `raw.tsv`. You can specify a different input path and file name by using the `--input_file` argument. The output of this command will be a file named `captions_{sample_fraction}.tsv` under the `data` folder. The number of selected captions will depend on the `--sample_fraction` argument. If you specify `--sample_fraction=1`, then all the captions from the original dataset will be considered. This file will contain only three columns:
 - caption UID (`id`);
@@ -99,22 +101,22 @@ You can skip the data download and preprocessing steps if you can provide your o
 
 You will need also to train a semantic word embeddings model. But first we need to prepare the training data using the following command:
 
-```
-$ python semantic_learning/unsupervised_preprocessing.py
+```sh
+python semantic_learning/unsupervised_preprocessing.py
 ```
 By default this command assumes the file to be preprocessed for training to be under the folder `data` and to be named as `raw.tsv`. You can specify a different input path and file name by using the `--input_file` argument. The output of this command will be a training file named `corpus_unsupervised.txt` under the `data` folder.
 
 At this point you can run the training by executing the following instruction:
-```
-$ python semantic_learning/unsupervised_training.py
+```sh
+python semantic_learning/unsupervised_training.py
 ```
 By default this command assumes the preprocessed input file to be under the folder `data` and to be named as `corpus_unsupervised.txt`. You can specify a different train path and file name by using the `--train_file` argument. The output of this command will be a binary file containing the trained model named `semantic_model.bin` under the `binaries` folder.
 
 ## Usage
 
 In order to initialize the search indices and components you will have to run the following:
-```
-$ python -m image_search.app_init --input_file <file_path>
+```sh
+python -m image_search.app_init --input_file <file_path>
 ```
 Where `<file_path>` is `data/captions_{sample_fraction}.tsv` as specified in the installation instructions. This command can take from a few seconds to some minutes according to the size of the input file. However, it important to highlight that this process is memory-intensive and therefore can require a lot of memory that grow roughly in a linear way with respect to the input dataset size. To give you some reference points:
 - ~200k captions require <2 GB;
@@ -124,12 +126,12 @@ Where `<file_path>` is `data/captions_{sample_fraction}.tsv` as specified in the
 Please, consider that this step will be run only once for a given dataset and will make the usage of the actual application very fast.
 
 At this point you can launch the application either through a [CLI](https://en.wikipedia.org/wiki/Command-line_interface) or a [Flask WebApp](https://github.com/pallets/flask) in these ways:
-```
-$ python -m image_search.app_cli
+```sh
+python -m image_search.app_cli
 ```
 or
-```
-$ python -m image_search.app_web
+```sh
+python -m image_search.app_web
 ```
 
 ## Solution overview
@@ -155,21 +157,29 @@ The second solution considers the usage of [semantic word embeddings](https://en
 To this purpose we rely on [fastText](https://github.com/facebookresearch/fastText) from Facebook AI Research that allows to train an unsupervised model of the text. The corresponding research paper is available [here](https://arxiv.org/pdf/1607.01759.pdf). A thoughtful overview of word embeddings models can be found [here](https://medium.com/@kashyapkathrani/all-about-embeddings-829c8ff0bf5b).
 <br>
 We conducted several experiments involving different hyperparameter configurations and then manually evaluating some sample similarities between pairs of words (e.g., [here](notebooks/unsupervised_models_check.ipynb)). After some trials, we selected the following hyperparameter configuration (for all the others we kept the default values):
-- dim=100: we experimented that enlarging the model size favored overfitting;
-- epoch=7: the default number of epochs (5) was insufficient as the loss plot did not converge;
-- minn=0 and maxn=0: since we already deal with mispelled words, it is redundant to model character n-grams;
-- wordNgrams=1: captions have on average ~10 words, hence it would be overwhelming considering for instance word bi-grams,
-- loss='hs': this loss ([hierarchical softmax](https://www.iro.umontreal.ca/~lisa/pointeurs/hierarchical-nnlm-aistats05.pdf)) is an approximation of the softmax loss that is more efficient at a negligible accuracy cost for our purpose.
+- `dim=100`: we experimented that enlarging the model size favored overfitting;
+- `epoch=7`: the default number of epochs (5) was insufficient as the loss plot did not converge;
+- `minn=0` and `maxn=0`: since we already deal with mispelled words, it is redundant to model character n-grams;
+- `wordNgrams=1`: captions have on average ~10 words, hence it would be overwhelming considering for instance word bi-grams;
+- `loss='hs'`: this loss ([hierarchical softmax](https://www.iro.umontreal.ca/~lisa/pointeurs/hierarchical-nnlm-aistats05.pdf)) is an approximation of the softmax loss that is more efficient at a negligible accuracy cost for our purpose.
 
 The original dataset from the Google competition came with classification labels. Hence, we gave supervised learning a try. As we expected, the results are worse than those of the unsupervised learning [here](notebooks/supervised_models_check.ipynb). The main reason for this is that unsupervised learning is expected to work well for a large pool of downstream tasks. On the other hand, if we train a supervised model for a specific task, i.e., classification, we cannot expect better performances if the downstream task is not classification.
 
 ### Use case 2 — term autocompletion
 
-
+We first check if the term that is currently being inserted (i.e., before a space button is pressed) is a known term. If not, we look for similar terms in our vocabulary by using the [Gestalt Pattern Matching](https://en.wikipedia.org/wiki/Gestalt_Pattern_Matching) algorithm. Differently from use case 1, the search for similar terms is carried out by comparing the term being inserted and all the vocabulary terms after cutting them off at the length of the input term plus one. The reason is that the term being inserted is assumed to be incomplete and cannot be directly compared to entire vocabulary terms.
+<br>
+This step will generate several candidates that need to be ranked based on their chance of occurence. Therefore, we check if there is a history of two terms, one term or no term prior to the last inserted term. According to the cases, we employ either a conditional frequency distribution model of word tri-grams or bi-grams, or a TF-IDF uni-gram model. Finally, based on the ranked suggestions, we provide the best term completion suggestion.
 
 ### Use case 3 — term autocorrection
 
+We first check if the last inserted term (i.e., after a space button is pressed) is a known term. If not, we look for similar terms in our vocabulary by using the [Gestalt Pattern Matching](https://en.wikipedia.org/wiki/Gestalt_Pattern_Matching) algorithm.
+<br>
+This step will generate several candidates that need to be ranked based on their chance of occurence. Therefore, we check if there is a history of two terms, one term or no term prior to the last inserted term. According to the cases, we employ either a conditional frequency distribution model of word tri-grams or bi-grams, or a TF-IDF uni-gram model. Finally, based on the ranked suggestions, we provide the best term correction suggestion.
+
 ### Use case 4 — term prediction
+
+We consider the last inserted term (i.e., after a space button is pressed) and evaluate the chance of occurence of next term candidates. Therefore, we check if there is a history of one or two terms. According to the cases, we employ either a conditional frequency distribution model of word tri-grams or bi-grams. Finally, based on the ranked suggestions, we provide the best term prediction suggestion.
 
 ## Roadmap
 
@@ -206,6 +216,24 @@ For a full list of all authors and contributors, see [the contributors page](htt
 
 ## Acknowledgements
 
-> **[?]**
-> If your work was funded by any organization or institution, acknowledge their support here.
-> In addition, if your work relies on other software libraries, or was inspired by looking at other work, it is appropriate to acknowledge this intellectual debt too.
+numpy - see [LICENSE.txt](https://github.com/numpy/numpy/blob/main/LICENSE.txt)
+
+pandas - see [LICENSE.txt](https://github.com/pandas-dev/pandas/blob/main/LICENSE)
+
+matplotlib - see [LICENSE](https://github.com/matplotlib/matplotlib/blob/main/LICENSE/LICENSE)
+
+nltk - see [LICENSE.txt](https://github.com/nltk/nltk/blob/develop/LICENSE.txt)
+
+scikit-learn - see [COPYING](https://github.com/scikit-learn/scikit-learn/blob/main/COPYING)
+
+fastText - see [LICENSE](https://github.com/facebookresearch/fastText/blob/main/LICENSE)
+
+flask - see [LICENSE.rst](https://github.com/pallets/flask/blob/main/LICENSE.rst)
+
+aiohttp - see [LICENSE.txt](https://github.com/aio-libs/aiohttp/blob/master/LICENSE.txt)
+
+pillow - see [LICENSE](https://github.com/python-pillow/Pillow/blob/main/LICENSE)
+
+getch - see [pypi](https://pypi.org/project/getch/)
+
+blessings - see [LICENSE](https://github.com/erikrose/blessings/blob/master/LICENSE)

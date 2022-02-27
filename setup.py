@@ -18,10 +18,8 @@ setup(
     package_dir={'': 'src'},
     zip_safe=False,
     install_requires=[
-        'python-decouple==3.5',
         'numpy==1.21.4',
         'pandas==1.3.4',
-        'scipy==1.8.0rc1',
         'matplotlib==3.5.1',
         'nltk==3.7',
         'scikit-learn==1.0.2',

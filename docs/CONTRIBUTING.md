@@ -4,19 +4,15 @@ When contributing to this repository, please first discuss the change you wish t
 
 ## Development environment setup
 
-> **[?]**
-> Proceed to describe how to setup local development environment.
-> e.g:
-
 To set up a development environment, please follow these steps:
-
-1. Clone the repo
-
-   ```sh
-   git clone https://github.com/jarvis0/image-search
-   ```
-
-2. TODO
+```sh
+git clone https://github.com/jarvis0/image-search.git
+cd image-search
+conda create --name image-search python=3.8.11 -y
+pip install --upgrade pip
+pip install -U pip setuptools wheel
+pip install .'[dev,lint,test]'
+```
 
 ## Issues and feature requests
 
