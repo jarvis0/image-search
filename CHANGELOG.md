@@ -5,7 +5,7 @@ For further information about changelog please go [here](http://keepachangelog.c
 
 ## [Unreleased]
 
-### refactor: project finalization  [#15](https://github.com/jarvis0/image-search/pull/15)
+### refactor: project finalization - [#15](https://github.com/jarvis0/image-search/pull/15)
 
 ### add: webapp typing assistant - [#13](https://github.com/jarvis0/image-search/pull/13)
 

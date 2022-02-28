@@ -1,7 +1,6 @@
 <h1 align="center">
   <a href="https://github.com/jarvis0/image-search">
-    <!-- Please provide path to your logo here -->
-    <img src="docs/images/logo.png" alt="Logo" width="100" height="100">
+    <img src="docs/media/logo.png" alt="Logo" width="100" height="100">
   </a>
 </h1>
 
@@ -30,7 +29,7 @@
 <summary>Table of Contents</summary>
 
 - [About](#about)
-- [Getting Started](#getting-started)
+- [Getting started](#getting-started)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
 - [Usage](#usage)
@@ -66,10 +65,10 @@ A data analysis notebook can be found [here](notebooks/data_analysis.ipynb).
 
 <details>
 <summary>Demos</summary>
-<img src="docs/images/screenshot.png" title="Login Page" width="100%">
+<img src="docs/media/cli.gif" title="Login Page" width="50%"><img src="docs/media/web.gif" title="Login Page" width="50%">
 </details>
 
-## Getting Started
+## Getting started
 
 ### Prerequisites
 This application relies on [fastText](https://github.com/facebookresearch/fastText). It builds on modern Mac OS and Linux distributions. Since it uses some C++11 features, it requires a compiler with good C++11 support. These include:
@@ -99,7 +98,7 @@ By default this command assumes the downloaded file to be under the folder `data
 
 You can skip the data download and preprocessing steps if you can provide your own TSV dataset of captions having the same columns as specified.
 
-Also, you will need to train a semantic word embeddings model. But first, we need to prepare the training data using the following command:
+Also, you will need to train a semantic word embeddings model. First, you will need to prepare the training data using the following command:
 
 ```sh
 python semantic_learning/unsupervised_preprocessing.py
@@ -136,13 +135,13 @@ python -m image_search.app_web
 
 ## Solution overview
 
-The key idea of making text search fast at runtime is to use an [Inverted Index](https://en.wikipedia.org/wiki/Inverted_index) as a core data structure. In fact, the initialization of the application is aimed at building such an inverted index that is a mapping from each unique term in the dataset to the list of captions where those terms appear. This way, the search for all the captions containing a given input term is $\mathcal{O}(1)$ instead of linear in the number of captions. From the inverted index, we filter out the top 1% of most frequent words intersected with a list of English [stop words](https://en.wikipedia.org/wiki/Stop_word). Stop words removal not only reduces the size of the inverted index but will also make the search much faster because very frequent and, therefore, irrelevant words are ruled out.
+The key idea of making text search fast at runtime is to use an [Inverted Index](https://en.wikipedia.org/wiki/Inverted_index) as a core data structure. In fact, the initialization of the application is aimed at building such an inverted index that is a mapping from each unique term in the dataset to the list of captions where those terms appear. This way, the search for all the captions containing a given input term has a constant time complexity instead of being linear in the number of captions. From the inverted index, we filter out the top 1% of most frequent words intersected with a list of English [stop words](https://en.wikipedia.org/wiki/Stop_word). Stop words removal not only reduces the size of the inverted index but will also make the search much faster because very frequent and, therefore, irrelevant words are ruled out.
 
 ### Use case 1 — caption autocompletion
 
 We rely on [Okapi BM25](https://en.wikipedia.org/wiki/Okapi_BM25) ranking function that is state-of-the-art in modern search engines. It estimates the relevance of a document with respect to a given search input. The key idea of such ranking function is to rely on a [vector space](https://en.wikipedia.org/wiki/Vector_space_model) representation of text. That is, to have an algebraic model for representing text as vectors of term identifiers. Each dimension of the vector model corresponds to a separate term. If a term (i.e., a word in our case) occurs in a document (i.e., a caption in our case), its value in the vector is non-zero. There are several ways to characterize the values in the vector model, one of this is indeed Okapi BM25 and it is grounded in the [TF-IDF](https://en.wikipedia.org/wiki/Tf%E2%80%93idf) weighting schema. It is a numerical statistic that is intended to reflect how important a term is to a document in a collection. The TF-IDF value increases proportionally to the number of times a term appears in the document and is offset by the number of documents in the collection that contain the term, which helps to adjust for the fact that some terms appear more frequently in general.
 <br>
-TF-IDF schema comes with several limitations. We address two of them since, in our opinion, are the most relevant for this project:
+TF-IDF schema comes with several limitations. We address two of them since, in our opinion, these are the most relevant for this project:
 1. search terms must precisely match document terms;
 2. documents with similar context but different term vocabulary are not associated.
 
@@ -216,28 +215,16 @@ For a full list of all authors and contributors, see [the contributors page](htt
 
 ## Acknowledgements
 
-numpy - see [LICENSE.txt](https://github.com/numpy/numpy/blob/main/LICENSE.txt)
-
-pandas - see [LICENSE.txt](https://github.com/pandas-dev/pandas/blob/main/LICENSE)
-
-matplotlib - see [LICENSE](https://github.com/matplotlib/matplotlib/blob/main/LICENSE/LICENSE)
-
-nltk - see [LICENSE.txt](https://github.com/nltk/nltk/blob/develop/LICENSE.txt)
-
-scikit-learn - see [COPYING](https://github.com/scikit-learn/scikit-learn/blob/main/COPYING)
-
-fastText - see [LICENSE](https://github.com/facebookresearch/fastText/blob/main/LICENSE)
-
-flask - see [LICENSE.rst](https://github.com/pallets/flask/blob/main/LICENSE.rst)
-
-aiohttp - see [LICENSE.txt](https://github.com/aio-libs/aiohttp/blob/master/LICENSE.txt)
-
-pillow - see [LICENSE](https://github.com/python-pillow/Pillow/blob/main/LICENSE)
-
-getch - see [pypi](https://pypi.org/project/getch/)
-
-blessings - see [LICENSE](https://github.com/erikrose/blessings/blob/master/LICENSE)
-
-amazing-github-template - see [LICENSE](https://github.com/dec0dOS/amazing-github-template/blob/main/LICENSE)
-
-Gifski - see [LICENSE](https://github.com/sindresorhus/Gifski/blob/main/license)
+- numpy - see [LICENSE.txt](https://github.com/numpy/numpy/blob/main/LICENSE.txt)
+- pandas - see [LICENSE.txt](https://github.com/pandas-dev/pandas/blob/main/LICENSE)
+- matplotlib - see [LICENSE](https://github.com/matplotlib/matplotlib/blob/main/LICENSE/LICENSE)
+- nltk - see [LICENSE.txt](https://github.com/nltk/nltk/blob/develop/LICENSE.txt)
+- scikit-learn - see [COPYING](https://github.com/scikit-learn/scikit-learn/blob/main/COPYING)
+- fastText - see [LICENSE](https://github.com/facebookresearch/fastText/blob/main/LICENSE)
+- flask - see [LICENSE.rst](https://github.com/pallets/flask/blob/main/LICENSE.rst)
+- aiohttp - see [LICENSE.txt](https://github.com/aio-libs/aiohttp/blob/master/LICENSE.txt)
+- pillow - see [LICENSE](https://github.com/python-pillow/Pillow/blob/main/LICENSE)
+- getch - see [pypi](https://pypi.org/project/getch/)
+- blessings - see [LICENSE](https://github.com/erikrose/blessings/blob/master/LICENSE)
+- amazing-github-template - see [LICENSE](https://github.com/dec0dOS/amazing-github-template/blob/main/LICENSE)
+- Gifski - see [LICENSE](https://github.com/sindresorhus/Gifski/blob/main/license)
