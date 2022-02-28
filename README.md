@@ -65,7 +65,8 @@ A data analysis notebook can be found [here](notebooks/data_analysis.ipynb).
 
 <details>
 <summary>Demos</summary>
-<img src="docs/media/cli.gif" title="Login Page" width="50%"><img src="docs/media/web.gif" title="Login Page" width="50%">
+<img src="docs/media/cli.gif" title="Login Page" width="100%">
+<img src="docs/media/web.gif" title="Login Page" width="100%">
 </details>
 
 ## Getting started
