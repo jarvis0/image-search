@@ -14,7 +14,7 @@
     "max_sequence_similarities": 3,
     "semantic_similarity_cutoff": 0.6,
     "max_semantic_similarities": 1,
-    "max_term_predictions": 1,
+    "max_term_completions": 1,
     "max_term_corrections": 1,
-    "max_term_completions": 1
+    "max_term_predictions": 1
 }
