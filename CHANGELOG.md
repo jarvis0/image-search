@@ -5,6 +5,8 @@ For further information about changelog please go [here](http://keepachangelog.c
 
 ## [Unreleased]
 
+## [1.0.0](https://github.com/jarvis0/typing-assistant/compare/v0.0.1...v1.0.0)
+
 ### add: documentation - [#16](https://github.com/jarvis0/image-search/pull/16)
 
 ### refactor: project finalization - [#15](https://github.com/jarvis0/image-search/pull/15)
